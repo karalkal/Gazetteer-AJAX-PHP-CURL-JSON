@@ -1,0 +1,398 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+
+	<title>Gazetteer-country explorer</title>
+	<meta name="description" content="All countries' maps and essential info">
+	<meta name="author" content="KK">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<!-- Favicon -->
+	<link rel="apple-touch-icon" sizes="180x180" href="libs/favicon/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="libs/favicon/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="libs/favicon/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+
+	<!-- CSS-->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+		integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+	<link rel="stylesheet" href="libs/css/styles.css">
+	<link rel="stylesheet" href="libs/css/preloader.css">
+	<!-- LEAFLET css + script -->
+	<!-- Main -->
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+		integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+	<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+		integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+	<!-- Button -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css">
+	<script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
+
+</head>
+
+<body>
+	<span id="selectContainer">
+		<select id="countrySelect" class="form-select shadow-sm">
+			<!-- populate from an AJAX CALL to a PHP routine that returns a JSON object that is an array of just ISO codes and names from countryBorders.geo.json -->
+			<option value="AF">Afghanistan</option>
+		</select>
+	</span>
+
+	<div id="map"></div>
+
+	<!-- example modal layout -->
+
+	<div id="exampleModal" class="modal" data-bs-backdrop="false" tabindex="-1">
+		<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content shadow">
+				<div class="modal-header bg-success bg-gradient text-white">
+					<h5 class="modal-title">Overview</h5>
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<table class="table table-striped">
+						<tr>
+
+							<td class="text-center">
+								<i class="fa-solid fa-street-view fa-xl text-success"></i>
+							</td>
+
+							<td>
+								Attribute
+							</td>
+
+							<td class="text-end">
+								value
+							</td>
+
+						</tr>
+						<tr>
+
+							<td class="text-center">
+								<i class="fa-solid fa-heart fa-xl text-success"></i>
+							</td>
+
+							<td>
+								Attribute
+							</td>
+
+							<td class="text-end">
+								value
+							</td>
+
+						</tr>
+						<tr>
+
+							<td class="text-center">
+								<i class="fa-solid fa-car fa-xl text-success"></i>
+							</td>
+
+							<td>
+								Attribute
+							</td>
+
+							<td class="text-end">
+								value
+							</td>
+
+						</tr>
+						<tr>
+
+							<td class="text-center">
+								<i class="fa-solid fa-book fa-xl text-success"></i>
+							</td>
+
+							<td>
+								Attribute
+							</td>
+
+							<td class="text-end">
+								value
+							</td>
+
+						</tr>
+						<tr>
+
+							<td class="text-center">
+								<i class="fa-solid fa-bath fa-xl text-success"></i>
+							</td>
+
+							<td>
+								Attribute
+							</td>
+
+							<td class="text-end">
+								value
+							</td>
+
+						</tr>
+						<tr>
+
+							<td class="text-center">
+								<i class="fa-solid fa-bell fa-xl text-success"></i>
+							</td>
+
+							<td>
+								Attribute
+							</td>
+
+							<td class="text-end">
+								value
+							</td>
+
+						</tr>
+						<tr>
+
+							<td class="text-center">
+								<i class="fa-solid fa-anchor fa-xl text-success"></i>
+							</td>
+
+							<td>
+								Attribute
+							</td>
+
+							<td class="text-end">
+								value
+							</td>
+
+						</tr>
+						<tr>
+
+							<td class="text-center">
+								<i class="fa-solid fa-money-bill fa-xl text-success"></i>
+							</td>
+
+							<td>
+								Attribute
+							</td>
+
+							<td class="text-end">
+								value
+							</td>
+
+						</tr>
+						<tr>
+
+							<td class="text-center">
+								<i class="fa-solid fa-wifi fa-xl text-success"></i>
+							</td>
+
+							<td>
+								Attribute
+							</td>
+
+							<td class="text-end">
+								value
+							</td>
+
+						</tr>
+						<tr>
+
+							<td class="text-center">
+								<i class="fa-solid fa-globe fa-xl text-success"></i>
+							</td>
+
+							<td>
+								Attribute
+							</td>
+
+							<td class="text-end">
+								value
+							</td>
+
+						</tr>
+						<tr>
+
+							<td class="text-center">
+								<i class="fa-solid fa-bicycle fa-xl text-success"></i>
+							</td>
+
+							<td>
+								Attribute
+							</td>
+
+							<td class="text-end">
+								value
+							</td>
+
+						</tr>
+						<tr>
+
+							<td class="text-center">
+								<i class="fa-solid fa-landmark fa-xl text-success"></i>
+							</td>
+
+							<td>
+								Attribute
+							</td>
+
+							<td class="text-end">
+								value
+							</td>
+
+						</tr>
+						<tr>
+
+							<td class="text-center">
+								<i class="fa-solid fa-tree fa-xl text-success"></i>
+							</td>
+
+							<td>
+								Attribute
+							</td>
+
+							<td class="text-end">
+								value
+							</td>
+
+						</tr>
+						<tr>
+
+							<td class="text-center">
+								<i class="fa-solid fa-bookmark fa-xl text-success"></i>
+							</td>
+
+							<td>
+								Attribute
+							</td>
+
+							<td class="text-end">
+								value
+							</td>
+
+						</tr>
+						<tr>
+
+							<td class="text-center">
+								<i class="fa-solid fa-bell fa-xl text-success"></i>
+							</td>
+
+							<td>
+								Attribute
+							</td>
+
+							<td class="text-end">
+								value
+							</td>
+
+						</tr>
+						<tr>
+
+							<td class="text-center">
+								<i class="fa-solid fa-fire fa-xl text-success"></i>
+							</td>
+
+							<td>
+								Attribute
+							</td>
+
+							<td class="text-end">
+								value
+							</td>
+
+						</tr>
+						<tr>
+
+							<td class="text-center">
+								<i class="fa-solid fa-key fa-xl text-success"></i>
+							</td>
+
+							<td>
+								Attribute
+							</td>
+
+							<td class="text-end">
+								value
+							</td>
+
+						</tr>
+						<tr>
+
+							<td class="text-center">
+								<i class="fa-solid fa-newspaper fa-xl text-success"></i>
+							</td>
+
+							<td>
+								Attribute
+							</td>
+
+							<td class="text-end">
+								value
+							</td>
+
+						</tr>
+						<tr>
+
+							<td class="text-center">
+								<i class="fa-solid fa-rocket fa-xl text-success"></i>
+							</td>
+
+							<td>
+								Attribute
+							</td>
+
+							<td class="text-end">
+								value
+							</td>
+
+						</tr>
+						<tr>
+
+							<td class="text-center">
+								<i class="fa-solid fa-wheelchair fa-xl text-success"></i>
+							</td>
+
+							<td>
+								Attribute
+							</td>
+
+							<td class="text-end">
+								value
+							</td>
+
+						</tr>
+						<tr>
+
+							<td class="text-center">
+								<i class="fa-solid fa-monument fa-xl text-success"></i>
+							</td>
+
+							<td>
+								Attribute
+							</td>
+
+							<td class="text-end">
+								value
+							</td>
+
+						</tr>
+					</table>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-outline-success btn-sm" data-bs-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id=”preloader”></div>
+
+	<!-- SCRIPTS -->
+	<!-- JQUERY  --  $(document).ready(function() ensures no issues with load at end of doc-->
+	<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
+		integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+		crossorigin="anonymous"></script>
+	<!-- Bootstrap --  suggested location by BS-->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+		crossorigin="anonymous"></script>
+
+	<script type="application/javascript" src="libs/js/script.js"></script>
+
+</body>
+
+</html>

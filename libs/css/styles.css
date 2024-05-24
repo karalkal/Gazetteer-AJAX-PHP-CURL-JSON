@@ -1,0 +1,44 @@
+@import url('https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700;1,400;1,700&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+/* arvo (slab) weight 400 and 700, normal and italic */
+
+/* CSS HEX */
+:root {
+    --font-main: : "Arvo", serif;
+    --font-display: "Open Sans", sans-serif;
+
+    --dark-slate-gray: #335c67ff;
+    --vanilla: #fff3b0ff;
+    --hunyadi-yellow: #e09f3eff;
+    --auburn: #9e2a2bff;
+    --chocolate-cosmos: #540b0eff;
+}
+
+
+* {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font-family: "Nunito Sans", sans-serif;
+    vertical-align: baseline;
+}
+
+#map {
+    width: 100%;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+#selectContainer {
+    position: fixed;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
+    padding: 11px 0;
+}
+
+#countrySelect {
+    width: 200px;
+    margin: 0 auto;
+}
