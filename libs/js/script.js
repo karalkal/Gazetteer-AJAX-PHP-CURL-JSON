@@ -22,7 +22,6 @@ var basemaps = {
 };
 
 // buttons
-
 var infoBtn = L.easyButton("fa-info", function (btn, map) {
 	$("#exampleModal").modal("show");
 });
@@ -31,7 +30,7 @@ var infoBtn = L.easyButton("fa-info", function (btn, map) {
 // EVENT HANDLERS
 // ---------------------------------------------------------
 
-// initialise and add controls once DOM is ready
+// initialize and add controls once DOM is ready
 
 $(document).ready(function () {
 
@@ -45,7 +44,31 @@ $(document).ready(function () {
 	// setView is not required in your application as you will be
 	// deploying map.fitBounds() on the country border polygon
 
-	layerControl = L.control.layers(basemaps).addTo(map);
+	var layerControl = L.control.layers(basemaps).addTo(map);
+
+	// current location
+	map.locate({ setView: true, maxZoom: 16 });
+
+	function onLocationFound(e) {
+		var radius = e.accuracy;
+		console.log(e)
+
+		L.marker(e.latlng).addTo(map)
+			.bindPopup("You are within " + radius + " meters from this point").openPopup();
+
+		L.circle(e.latlng, radius).addTo(map);
+	}
+
+	
+	function onLocationError(e) {
+		alert(e.message);
+	}
+	
+	map.on('locationfound', onLocationFound);
+	map.on('locationerror', onLocationError);
+
+
+
 
 	infoBtn.addTo(map);
 
