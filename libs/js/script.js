@@ -21,7 +21,6 @@ var basemaps = {
 	"Satellite": satellite
 };
 
-
 // ---------------------------------------------------------
 // EVENT HANDLERS
 // ---------------------------------------------------------
@@ -29,6 +28,36 @@ var basemaps = {
 // initialize and add controls once DOM is ready
 
 $(document).ready(function () {
+
+
+
+	$.ajax({
+		url: "libs/php/getAllCountriesData.php",
+		type: 'GET',
+		dataType: 'json',
+
+		success: function (result) {
+
+			console.log(JSON.stringify(result));
+
+			// if (result.status.name == "ok") {
+
+			// 	$('#txtContinent').html(result['data'][0]['continent']);
+			// 	$('#txtCapital').html(result['data'][0]['capital']);
+			// 	$('#txtLanguages').html(result['data'][0]['languages']);
+			// 	$('#txtPopulation').html(result['data'][0]['population']);
+			// 	$('#txtArea').html(result['data'][0]['areaInSqKm']);
+
+			// }
+
+		},
+		error: function (jqXHR, textStatus, errorThrown) {
+			// your error code
+		}
+	});
+
+
+
 
 	map = L.map("map", {
 		layers: [
@@ -59,6 +88,7 @@ $(document).ready(function () {
 	map.on('click', (e) => displayMap(e.latlng));
 	// on drag marker
 	marker.on('dragend', (e) => displayMap(e.target.getLatLng()));
+
 
 
 	function displayMap(latlng) {
