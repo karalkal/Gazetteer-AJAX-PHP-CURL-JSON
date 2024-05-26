@@ -21,10 +21,6 @@ var basemaps = {
 	"Satellite": satellite
 };
 
-// buttons
-var infoBtn = L.easyButton("fa-info", function (btn, map) {
-	$("#exampleModal").modal("show");
-});
 
 // ---------------------------------------------------------
 // EVENT HANDLERS
@@ -45,31 +41,46 @@ $(document).ready(function () {
 	// deploying map.fitBounds() on the country border polygon
 
 	var layerControl = L.control.layers(basemaps).addTo(map);
+	/*
+	create marker and circle with default values, 
+	if user allows location set it to location values, 
+	then when marker is moved set to new values
+	*/
+	var marker = L.marker([0, 0],
+		{ draggable: true })
+		.addTo(map);
 
-	// current location
+	// initial location
 	map.locate({ setView: true, maxZoom: 16 });
-
-	function onLocationFound(e) {
-		var radius = e.accuracy;
-		console.log(e)
-
-		L.marker(e.latlng).addTo(map)
-			.bindPopup("You are within " + radius + " meters from this point").openPopup();
-
-		L.circle(e.latlng, radius).addTo(map);
-	}
-
-	
-	function onLocationError(e) {
-		alert(e.message);
-	}
-	
-	map.on('locationfound', onLocationFound);
+	map.once('locationfound', (e) => displayMap(e.latlng));
 	map.on('locationerror', onLocationError);
 
+	// on click map
+	map.on('click', (e) => displayMap(e.latlng));
+	// on drag marker
+	marker.on('dragend', (e) => displayMap(e.target.getLatLng()));
 
 
+	function displayMap(latlng) {
+		marker.setLatLng(latlng)
+			.bindPopup(`lat: ${latlng.lat}, <br>lng: ${latlng.lng}`).openPopup();
+		map.panTo([latlng.lat, latlng.lng])
 
+	}
+
+
+	function onLocationError(e) {
+		console.log(e);
+		if (e.code === 1) {
+
+		}
+		alert(e.message);
+	}
+
+	// info buttons
+	var infoBtn = L.easyButton("fa-info", function (btn, map) {
+		$("#exampleModal").modal("show");
+	});
 	infoBtn.addTo(map);
 
 })
