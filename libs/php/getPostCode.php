@@ -21,14 +21,14 @@ $result = curl_exec($ch);
 
 curl_close($ch);
 
-$decode = json_decode($result, true);
+$decodedDataArray = json_decode($result, true);
 
 $output['status']['code'] = "200";
 $output['status']['name'] = "ok";
 $output['status']['description'] = "success";
 $output['status']['returnedIn'] = intval((microtime(true) - $executionStartTime) * 1000) . " ms";
-if (sizeof($decode['postalCodes']) > 0) {
-    $output['data'] = $decode['postalCodes'];
+if (sizeof($decodedDataArray['postalCodes']) > 0) {
+    $output['data'] = $decodedDataArray['postalCodes'];
     $output['status']['foundPostCode'] = true;
 } else {
     $output['status']['foundPostCode'] = false;

@@ -19,7 +19,7 @@ $result = curl_exec($ch);
 
 curl_close($ch);
 
-$decode = json_decode($result, true);
+$decodedDataArray = json_decode($result, true);
 // print_r($decode);
 
 $output['status']['code'] = "200";
@@ -27,8 +27,8 @@ $output['status']['name'] = "ok";
 $output['status']['description'] = "success";
 $output['status']['returnedIn'] = intval((microtime(true) - $executionStartTime) * 1000) . " ms";
 
-if (array_key_exists('weatherObservation', $decode)) {
-    $output['data'] = $decode['weatherObservation'];
+if (array_key_exists('weatherObservation', $decodedDataArray)) {
+    $output['data'] = $decodedDataArray['weatherObservation'];
     $output['status']['foundWeatherStation'] = true;
 } else {
     $output['status']['foundWeatherStation'] = false;

@@ -19,14 +19,14 @@ $result = curl_exec($ch);
 
 curl_close($ch);
 
-$decode = json_decode($result, true);
+$decodedDataArray = json_decode($result, true);
 
 $output['status']['code'] = "200";
 $output['status']['name'] = "ok";
 $output['status']['description'] = "success";
 $output['status']['returnedIn'] = intval((microtime(true) - $executionStartTime) * 1000) . " ms";
-if (sizeof($decode['geonames']) > 0) {
-    $output['data'] = $decode['geonames'][0];
+if (sizeof($decodedDataArray['geonames']) > 0) {
+    $output['data'] = $decodedDataArray['geonames'][0];
     $output['status']['foundTown'] = true;
 } else {
     $output['status']['foundTown'] = false;

@@ -18,15 +18,15 @@ $result = curl_exec($ch);
 
 curl_close($ch);
 
-$decode = json_decode($result, true);
+$decodedDataArray = json_decode($result, true);
 
 $output['status']['code'] = "200";
 $output['status']['name'] = "ok";
 $output['status']['description'] = "success";
 $output['status']['returnedIn'] = intval((microtime(true) - $executionStartTime) * 1000) . " ms";
-$output['data']['lat'] = $decode['lat'];
-$output['data']['lng'] = $decode['lng'];
-$output['data']['srtm1'] = $decode['srtm1'];
+$output['data']['lat'] = $decodedDataArray['lat'];
+$output['data']['lng'] = $decodedDataArray['lng'];
+$output['data']['srtm1'] = $decodedDataArray['srtm1'];
 
 header('Content-Type: application/json; charset=UTF-8');
 
