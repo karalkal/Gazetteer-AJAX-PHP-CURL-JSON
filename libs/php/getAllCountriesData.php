@@ -17,9 +17,6 @@ foreach ($decodedDataArray['features'] as $countyData) {
 }
 // sort array in place
 usort($truncatedDataArray, function ($a, $b) {
-    // echo $a['name'] .'<--->'. $b['name'];
-    // echo strcmp($a['name'], $b['name']);
-    // echo "\n";
     return strcmp($a['name'], $b['name']);
 });
 // print_r($truncatedDataArray);

@@ -8,13 +8,11 @@ var map;
 
 var streets = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", {
 	attribution: "Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012"
-}
-);
+});
 
 var satellite = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
 	attribution: "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
-}
-);
+});
 
 var basemaps = {
 	"Streets": streets,
@@ -28,36 +26,27 @@ var basemaps = {
 // initialize and add controls once DOM is ready
 
 $(document).ready(function () {
-
-
-
+	// Load Counties <select> options
 	$.ajax({
 		url: "libs/php/getAllCountriesData.php",
 		type: 'GET',
 		dataType: 'json',
 
 		success: function (result) {
-
-			console.log(JSON.stringify(result));
-
-			// if (result.status.name == "ok") {
-
-			// 	$('#txtContinent').html(result['data'][0]['continent']);
-			// 	$('#txtCapital').html(result['data'][0]['capital']);
-			// 	$('#txtLanguages').html(result['data'][0]['languages']);
-			// 	$('#txtPopulation').html(result['data'][0]['population']);
-			// 	$('#txtArea').html(result['data'][0]['areaInSqKm']);
-
-			// }
+			$.each(result.data, function (index, value) {
+				console.log(index, value)
+				$('#countrySelect')
+					.append($("<option></option>")
+						.attr("value", value.iso_a2)
+						.text(value.name));
+			});
 
 		},
 		error: function (jqXHR, textStatus, errorThrown) {
-			// your error code
+			console.log(error);
+			alert("Something went wrong")
 		}
 	});
-
-
-
 
 	map = L.map("map", {
 		layers: [
@@ -95,7 +84,6 @@ $(document).ready(function () {
 		marker.setLatLng(latlng)
 			.bindPopup(`lat: ${latlng.lat}, <br>lng: ${latlng.lng}`).openPopup();
 		map.panTo([latlng.lat, latlng.lng])
-
 	}
 
 
