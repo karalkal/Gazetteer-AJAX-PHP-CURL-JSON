@@ -79,8 +79,8 @@ $(document).ready(function () {
 	marker.on('dragend', (e) => displayMap(e.target.getLatLng()));
 
 
-
 	function displayMap(latlng) {
+		console.log(latlng)
 		marker.setLatLng(latlng)
 			.bindPopup(`lat: ${latlng.lat}, <br>lng: ${latlng.lng}`).openPopup();
 		map.panTo([latlng.lat, latlng.lng])
@@ -90,9 +90,12 @@ $(document).ready(function () {
 	function onLocationError(e) {
 		console.log(e);
 		if (e.code === 1) {
-
+			alert("default initial location will be set to\nLatitude 0, Longitude 0");
+			displayMap({ lat: 0, lng: 0 });
 		}
-		alert(e.message);
+		else {
+			alert(e.message);
+		}
 	}
 
 	// info buttons
