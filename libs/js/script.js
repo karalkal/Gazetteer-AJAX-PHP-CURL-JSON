@@ -1,49 +1,83 @@
 // tile layers and init
-let satelite = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.{ext}', {
-	minZoom: 0,
-	maxZoom: 20,
+const Stadia_AlidadeSatellite = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.{ext}', {
+	maxZoom: 22,
 	attribution: '&copy; CNES, Distribution Airbus DS, © Airbus DS, © PlanetObserver (Contains Copernicus Data) | &copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 	ext: 'jpg'
 });
 
-let streets = L.tileLayer('https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.{ext}', {
-	minZoom: 0,
-	maxZoom: 20,
-	attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-	ext: 'png'
+
+const Jawg_Terrain = L.tileLayer('https://tile.jawg.io/jawg-terrain/{z}/{x}/{y}{r}.png?access-token={accessToken}', {
+	maxZoom: 22,
+	attribution: '<a href="https://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+	accessToken: 'mJZnCYHFpNftBsC6PF64A1V0f7vwRW5xneYEg4rRfMoZimE53hjq2wJUuG1btLQ4'
 });
 
-let terrain = L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_terrain_background/{z}/{x}/{y}{r}.{ext}', {
-	minZoom: 0,
-	maxZoom: 18,
-	attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-	ext: 'png'
+
+const OpenStreetMap_HOT = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+	maxZoom: 22,
+	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>'
 });
 
-let watercolour = L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.{ext}', {
-	minZoom: 1,
-	maxZoom: 16,
-	attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-	ext: 'jpg'
+const OpenRailwayMap = L.tileLayer('https://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png', {
+	maxZoom: 22,
+	attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | Map style: &copy; <a href="https://www.OpenRailwayMap.org">OpenRailwayMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
 });
+
 
 let map = L.map("map", {
-	layers: [satelite, streets, terrain, watercolour]
+	layers: [Stadia_AlidadeSatellite, OpenStreetMap_HOT]
 });
 
 
-let basemaps = { 		// last one in list will be displayed by default
-	"Satelite": satelite, "Terrain": terrain, "Watercolour": watercolour, "Streets": streets
+const baseMaps = { 		// last one in list will be displayed by default on initial render
+	"Satelite (Stadia)": Stadia_AlidadeSatellite, "Terrain (Jawg Lab)": Jawg_Terrain, "General (OpenStreetMap)": OpenStreetMap_HOT
 };
 
-L.control.layers(basemaps).addTo(map);
+const overlayMaps = {
+	"Rail (OpenRailwayMap)": OpenRailwayMap
+};
 
+L.control.layers(baseMaps, overlayMaps).addTo(map);
 
 
 $(document).ready(function () {
 	loadAllCountriesData();			// Load Counties <select> options
-	centerMapOnSelectedCountry();	// get country boundaries, remove prev. polygon and center map
 
+
+	// initial location
+	let countryCode;		//undefined for now
+	map.locate({ setView: true, maxZoom: 16 });
+	map.once('locationfound', setCountryOfLocation);
+	// map.on('locationerror', onLocationError);
+	map.on('locationerror', () => console.log("oppa"));
+
+	$("#countrySelect").on("change", () => {
+		countryCode = $("#countrySelect").val();
+		centerMapOnSelectedCountry(countryCode);
+	});
+
+
+	function setCountryOfLocation(e) {
+		const { lat, lng } = e.latlng;
+		$.ajax({
+			url: "libs/php/getCountryCode.php",
+			type: 'GET',
+			dataType: 'json',		// will send request to JSON endpoint anyway but can set different format if one is available/required
+			data: {
+				lat: lat,
+				lng: lng
+			},
+
+			success: function (result) {
+				centerMapOnSelectedCountry(result.data.countryCode);	// get country boundaries, remove prev. polygon and center map
+			},
+
+			error: function (jqXHR, textStatus, errorThrown) {
+				console.log(jqXHR, textStatus, errorThrown)
+			}
+		});
+
+	}
 
 	/*
 	create marker and circle with default values, 
@@ -53,10 +87,7 @@ $(document).ready(function () {
 		{ draggable: true })
 		.addTo(map);
 	
-	// initial location
-	map.locate({ setView: true, maxZoom: 16 });
-	map.once('locationfound', (e) => displayMap(e.latlng));
-	map.on('locationerror', onLocationError);
+	
 	
 	// on click map
 	map.on('click', (e) => displayMap(e.latlng));
@@ -116,49 +147,45 @@ function loadAllCountriesData() {
 	});
 }
 
-function centerMapOnSelectedCountry() {
-	$("#countrySelect").on("change", () => {
-		const countryCode = $("#countrySelect").val();
+function centerMapOnSelectedCountry(countryCode) {
+	$.ajax({
+		url: "libs/php/getCountryBoundaries.php",
+		type: 'GET',
+		dataType: 'json',
+		data: ({ countryCode: countryCode }),
 
-		$.ajax({
-			url: "libs/php/getCountryBoundaries.php",
-			type: 'GET',
-			dataType: 'json',
-			data: ({ countryCode: countryCode }),
-
-			success: function (result) {
-				// NB - we need latlng arrays but the STUPID json is providing longitude first, then latitude, hence need to invert them
-				let latlngs = []
-				if (result.data.geometryType === "Polygon") {
-					for (let tuple of result.data.coordinatesArray[0]) {
-						latlngs.push([tuple[1], tuple[0]])
-					}
+		success: function (result) {
+			// NB - we need latlng arrays but the STUPID json is providing longitude first, then latitude, hence need to invert them
+			let latlngs = []
+			if (result.data.geometryType === "Polygon") {
+				for (let tuple of result.data.coordinatesArray[0]) {
+					latlngs.push([tuple[1], tuple[0]])
 				}
-				else if (result.data.geometryType === "MultiPolygon") {		// island countries etc.
-					for (let nestedArr of result.data.coordinatesArray) {
-						let invertedTuple = []
-						for (let tuple of nestedArr[0]) {
-							invertedTuple.push([tuple[1], tuple[0]]);
-						}
-						latlngs.push(invertedTuple)
-					}
-				}
-				else {
-					throw new Error(`Invalid geometryType ${result.data.geometryType}`)
-				}
-
-				// polygon is used to determine borders of selected country and then "fill" screen 
-				let polygon = L.polygon(latlngs, { color: 'green' }).addTo(map);
-				// zoom the map to the polygon
-				map.fitBounds(polygon.getBounds());
-				setTimeout(() => polygon.removeFrom(map), 4400)
-			},
-			error: function (jqXHR, textStatus, errorThrown) {
-				console.log(jqXHR, textStatus, errorThrown);
-				alert("Something went wrong")
 			}
-		});
+			else if (result.data.geometryType === "MultiPolygon") {		// island countries etc.
+				for (let nestedArr of result.data.coordinatesArray) {
+					let invertedTuple = []
+					for (let tuple of nestedArr[0]) {
+						invertedTuple.push([tuple[1], tuple[0]]);
+					}
+					latlngs.push(invertedTuple)
+				}
+			}
+			else {
+				throw new Error(`Invalid geometryType ${result.data.geometryType}`)
+			}
 
-	}
-	);
+			// polygon is used to determine borders of selected country and then "fill" screen 
+			let polygon = L.polygon(latlngs, { color: 'green' }).addTo(map);
+			// zoom the map to the polygon
+			map.fitBounds(polygon.getBounds());
+			setTimeout(() => polygon.removeFrom(map), 4400)
+		},
+		error: function (jqXHR, textStatus, errorThrown) {
+			console.log(jqXHR, textStatus, errorThrown);
+			alert("Something went wrong")
+		}
+	});
+
+
 }
