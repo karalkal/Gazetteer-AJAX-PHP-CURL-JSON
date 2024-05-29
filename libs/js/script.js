@@ -43,41 +43,28 @@ L.control.layers(baseMaps, overlayMaps).addTo(map);
 $(document).ready(function () {
 	loadAllCountriesData();			// Load Counties <select> options
 
-
-	// initial location
-	let countryCode;		//undefined for now
+	/**	Set initial location:
+		if user opts in => get latlng from event, send request to get countryCode and display map
+		if user refuses, display default country map
+	*/
 	map.locate({ setView: true, maxZoom: 16 });
-	map.once('locationfound', setCountryOfLocation);
-	// map.on('locationerror', onLocationError);
-	map.on('locationerror', () => console.log("oppa"));
+	map.once('locationfound', setCountryOfLocation); // gets code AND sets location
+	map.on('locationerror', (e) => {
+		if (e.code === 1) {
+			alert("Default initial map will be set to Greece\n(because this is where it all started).\n:-)");
+			centerMapOnSelectedCountry("GR");
+		}
+		else {
+			alert(e.message);
+		}
+	});
 
+	// Enable selection of country from menu
 	$("#countrySelect").on("change", () => {
-		countryCode = $("#countrySelect").val();
+		const countryCode = $("#countrySelect").val();
 		centerMapOnSelectedCountry(countryCode);
 	});
 
-
-	function setCountryOfLocation(e) {
-		const { lat, lng } = e.latlng;
-		$.ajax({
-			url: "libs/php/getCountryCode.php",
-			type: 'GET',
-			dataType: 'json',		// will send request to JSON endpoint anyway but can set different format if one is available/required
-			data: {
-				lat: lat,
-				lng: lng
-			},
-
-			success: function (result) {
-				centerMapOnSelectedCountry(result.data.countryCode);	// get country boundaries, remove prev. polygon and center map
-			},
-
-			error: function (jqXHR, textStatus, errorThrown) {
-				console.log(jqXHR, textStatus, errorThrown)
-			}
-		});
-
-	}
 
 	/*
 	create marker and circle with default values, 
@@ -86,33 +73,18 @@ $(document).ready(function () {
 	var marker = L.marker([0, 0],
 		{ draggable: true })
 		.addTo(map);
-	
-	
-	
+		
 	// on click map
 	map.on('click', (e) => displayMap(e.latlng));
 	// on drag marker
 	marker.on('dragend', (e) => displayMap(e.target.getLatLng()));
-	
-	
+		
 	function displayMap(latlng) {
 		// console.log(latlng)
 		marker.setLatLng(latlng)
 			.bindPopup(`lat: ${latlng.lat}, <br>lng: ${latlng.lng}`).openPopup();
 		map.panTo([latlng.lat, latlng.lng])
-	}
-	
-	
-	function onLocationError(e) {
-		console.log(e);
-		if (e.code === 1) {
-			alert("default initial location will be set to\nLatitude 0, Longitude 0");
-			displayMap({ lat: 0, lng: 0 });
-		}
-		else {
-			alert(e.message);
-		}
-	}
+	}	
 	*/
 
 	// info buttons
@@ -147,7 +119,7 @@ function loadAllCountriesData() {
 	});
 }
 
-function centerMapOnSelectedCountry(countryCode) {
+function centerMapOnSelectedCountry(countryCode) {		// get country boundaries, remove prev. polygon and center map
 	$.ajax({
 		url: "libs/php/getCountryBoundaries.php",
 		type: 'GET',
@@ -187,5 +159,27 @@ function centerMapOnSelectedCountry(countryCode) {
 		}
 	});
 
+
+}
+
+function setCountryOfLocation(e) {
+	const { lat, lng } = e.latlng;
+	$.ajax({
+		url: "libs/php/getCountryCode.php",
+		type: 'GET',
+		dataType: 'json',
+		data: {
+			lat: lat,
+			lng: lng
+		},
+
+		success: function (result) {
+			centerMapOnSelectedCountry(result.data.countryCode);
+		},
+
+		error: function (jqXHR, textStatus, errorThrown) {
+			console.log(jqXHR, textStatus, errorThrown)
+		}
+	});
 
 }
