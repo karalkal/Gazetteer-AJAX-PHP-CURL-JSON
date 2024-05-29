@@ -1,7 +1,3 @@
-// ---------------------------------------------------------
-// GLOBAL DECLARATIONS
-// ---------------------------------------------------------
-
 var map;
 
 // tile layers
@@ -19,51 +15,71 @@ var basemaps = {
 	"Satellite": satellite
 };
 
-// ---------------------------------------------------------
-// EVENT HANDLERS
-// ---------------------------------------------------------
-
-// initialize and add controls once DOM is ready
 
 $(document).ready(function () {
-	// Load Counties <select> options
-	$.ajax({
-		url: "libs/php/getAllCountriesData.php",
-		type: 'GET',
-		dataType: 'json',
+	loadAllCountriesData();		// Load Counties <select> options
 
-		success: function (result) {
-			$.each(result.data, function (index, value) {
-				console.log(index, value)
-				$('#countrySelect')
-					.append($("<option></option>")
-						.attr("value", value.iso_a2)
-						.text(value.name));
-			});
 
-		},
-		error: function (jqXHR, textStatus, errorThrown) {
-			console.log(error);
-			alert("Something went wrong")
-		}
-	});
+	// get country boundaries
+	$("#countrySelect").on("change", () => {
+		const countryCode = $("#countrySelect").val();
+
+		$.ajax({
+			url: "libs/php/getCountryBoundaries.php",
+			type: 'GET',
+			dataType: 'json',
+			data: ({ countryCode: countryCode }),
+
+			success: function (result) {
+				// NB - we need latlng arrays but the STUPID json is providing longitude first, then latitude, hence need to invert them
+				let latlngs = []
+				if (result.data.geometryType === "Polygon") {
+					for (let tuple of result.data.coordinatesArray[0]) {
+						console.log(tuple[0])
+						latlngs.push([tuple[1], tuple[0]])
+					}
+				}
+				else if (result.data.geometryType === "MultiPolygon") {
+					console.log(result.data.coordinatesArray)
+				}
+				else {
+					throw new Error(`Invalid geometryType ${result.data.geometryType}`)
+				}
+
+
+
+				console.log(latlngs)
+				// polygon is used to determine borders of selected country and then "fill" screen 
+				var polygon = L.polygon(latlngs, { color: 'red' }).addTo(map);
+				// zoom the map to the polygon
+				map.fitBounds(polygon.getBounds());
+
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				console.log(jqXHR, textStatus, errorThrown);
+				alert("Something went wrong")
+			}
+		});
+
+	}
+	);
 
 	map = L.map("map", {
 		layers: [
 			streets,
 			satellite
 		]
-	}).setView([54.5, -4], 6);
+	})
+	// .setView([54.5, -4], 6);
 
 	// setView is not required in your application as you will be
 	// deploying map.fitBounds() on the country border polygon
 
-	var layerControl = L.control.layers(basemaps).addTo(map);
+	L.control.layers(basemaps).addTo(map);
 	/*
 	create marker and circle with default values, 
 	if user allows location set it to location values, 
 	then when marker is moved set to new values
-	*/
 	var marker = L.marker([0, 0],
 		{ draggable: true })
 		.addTo(map);
@@ -80,7 +96,7 @@ $(document).ready(function () {
 
 
 	function displayMap(latlng) {
-		console.log(latlng)
+		// console.log(latlng)
 		marker.setLatLng(latlng)
 			.bindPopup(`lat: ${latlng.lat}, <br>lng: ${latlng.lng}`).openPopup();
 		map.panTo([latlng.lat, latlng.lng])
@@ -97,6 +113,7 @@ $(document).ready(function () {
 			alert(e.message);
 		}
 	}
+	*/
 
 	// info buttons
 	var infoBtn = L.easyButton("fa-info", function (btn, map) {
@@ -105,3 +122,27 @@ $(document).ready(function () {
 	infoBtn.addTo(map);
 
 })
+
+
+function loadAllCountriesData() {
+	$.ajax({
+		url: "libs/php/getAllCountriesData.php",
+		type: 'GET',
+		dataType: 'json',
+
+		success: function (result) {
+			$.each(result.data.allCountriesArr, function (index, value) {
+				// console.log(index, value)
+				$('#countrySelect')
+					.append($("<option></option>")
+						.attr("value", value.iso_a2)
+						.text(value.name));
+			});
+
+		},
+		error: function (jqXHR, textStatus, errorThrown) {
+			console.log(jqXHR, textStatus, errorThrown);
+			alert("Something went wrong")
+		}
+	});
+}

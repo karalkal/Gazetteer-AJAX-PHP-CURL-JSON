@@ -15,13 +15,13 @@ curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_URL, $url);
 
-$result = curl_exec($ch);
+$resultJson = curl_exec($ch);
 
 // echo "RESULT:\n" . $result;
 
 curl_close($ch);
 
-$decodedDataArray = json_decode($result, true);
+$decodedDataArray = json_decode($resultJson, true);
 
 $output['status']['code'] = "200";
 $output['status']['name'] = "ok";
