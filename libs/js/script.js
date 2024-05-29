@@ -17,52 +17,8 @@ var basemaps = {
 
 
 $(document).ready(function () {
-	loadAllCountriesData();		// Load Counties <select> options
-
-
-	// get country boundaries
-	$("#countrySelect").on("change", () => {
-		const countryCode = $("#countrySelect").val();
-
-		$.ajax({
-			url: "libs/php/getCountryBoundaries.php",
-			type: 'GET',
-			dataType: 'json',
-			data: ({ countryCode: countryCode }),
-
-			success: function (result) {
-				// NB - we need latlng arrays but the STUPID json is providing longitude first, then latitude, hence need to invert them
-				let latlngs = []
-				if (result.data.geometryType === "Polygon") {
-					for (let tuple of result.data.coordinatesArray[0]) {
-						console.log(tuple[0])
-						latlngs.push([tuple[1], tuple[0]])
-					}
-				}
-				else if (result.data.geometryType === "MultiPolygon") {
-					console.log(result.data.coordinatesArray)
-				}
-				else {
-					throw new Error(`Invalid geometryType ${result.data.geometryType}`)
-				}
-
-
-
-				console.log(latlngs)
-				// polygon is used to determine borders of selected country and then "fill" screen 
-				var polygon = L.polygon(latlngs, { color: 'red' }).addTo(map);
-				// zoom the map to the polygon
-				map.fitBounds(polygon.getBounds());
-
-			},
-			error: function (jqXHR, textStatus, errorThrown) {
-				console.log(jqXHR, textStatus, errorThrown);
-				alert("Something went wrong")
-			}
-		});
-
-	}
-	);
+	loadAllCountriesData();			// Load Counties <select> options
+	centerMapOnSelectedCountry();	// get country boundaries, remove prev. polygon and center map
 
 	map = L.map("map", {
 		layers: [
@@ -70,10 +26,6 @@ $(document).ready(function () {
 			satellite
 		]
 	})
-	// .setView([54.5, -4], 6);
-
-	// setView is not required in your application as you will be
-	// deploying map.fitBounds() on the country border polygon
 
 	L.control.layers(basemaps).addTo(map);
 	/*
@@ -83,26 +35,26 @@ $(document).ready(function () {
 	var marker = L.marker([0, 0],
 		{ draggable: true })
 		.addTo(map);
-
+	
 	// initial location
 	map.locate({ setView: true, maxZoom: 16 });
 	map.once('locationfound', (e) => displayMap(e.latlng));
 	map.on('locationerror', onLocationError);
-
+	
 	// on click map
 	map.on('click', (e) => displayMap(e.latlng));
 	// on drag marker
 	marker.on('dragend', (e) => displayMap(e.target.getLatLng()));
-
-
+	
+	
 	function displayMap(latlng) {
 		// console.log(latlng)
 		marker.setLatLng(latlng)
 			.bindPopup(`lat: ${latlng.lat}, <br>lng: ${latlng.lng}`).openPopup();
 		map.panTo([latlng.lat, latlng.lng])
 	}
-
-
+	
+	
 	function onLocationError(e) {
 		console.log(e);
 		if (e.code === 1) {
@@ -145,4 +97,51 @@ function loadAllCountriesData() {
 			alert("Something went wrong")
 		}
 	});
+}
+
+function centerMapOnSelectedCountry() {
+	$("#countrySelect").on("change", () => {
+		const countryCode = $("#countrySelect").val();
+
+		$.ajax({
+			url: "libs/php/getCountryBoundaries.php",
+			type: 'GET',
+			dataType: 'json',
+			data: ({ countryCode: countryCode }),
+
+			success: function (result) {
+				// NB - we need latlng arrays but the STUPID json is providing longitude first, then latitude, hence need to invert them
+				let latlngs = []
+				if (result.data.geometryType === "Polygon") {
+					for (let tuple of result.data.coordinatesArray[0]) {
+						latlngs.push([tuple[1], tuple[0]])
+					}
+				}
+				else if (result.data.geometryType === "MultiPolygon") {		// island countries etc.
+					for (let nestedArr of result.data.coordinatesArray) {
+						let invertedTuple = []
+						for (let tuple of nestedArr[0]) {
+							invertedTuple.push([tuple[1], tuple[0]]);
+						}
+						latlngs.push(invertedTuple)
+					}
+				}
+				else {
+					throw new Error(`Invalid geometryType ${result.data.geometryType}`)
+				}
+
+				// polygon is used to determine borders of selected country and then "fill" screen 
+				let polygon = L.polygon(latlngs, { color: 'green' }).addTo(map);
+				// zoom the map to the polygon
+				map.fitBounds(polygon.getBounds());
+				setTimeout(() => polygon.removeFrom(map), 4400)
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				console.log(jqXHR, textStatus, errorThrown);
+				alert("Something went wrong")
+			}
+		});
+
+	}
+	);
 }
