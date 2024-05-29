@@ -6,11 +6,11 @@
     --font-main: : "Arvo", serif;
     --font-display: "Open Sans", sans-serif;
 
-    --dark-slate-gray: #335c67ff;
-    --vanilla: #fff3b0ff;
-    --hunyadi-yellow: #e09f3eff;
-    --auburn: #9e2a2bff;
-    --chocolate-cosmos: #540b0eff;
+    --prussian-blue: hsla(201, 100%, 14%, 1);
+    --fire-engine-red: hsla(0, 69%, 50%, 1);
+    --orange-wheel: hsla(31, 100%, 48%, 1);
+    --xanthous: hsla(40, 97%, 64%, 1);
+    --vanilla: hsla(51, 55%, 82%, 1);
 }
 
 
@@ -19,7 +19,6 @@
     padding: 0;
     border: 0;
     font-size: 100%;
-    font-family: "Nunito Sans", sans-serif;
     vertical-align: baseline;
 }
 
@@ -36,9 +35,46 @@
     z-index: 1000;
     width: 100%;
     padding: 11px 0;
+    text-align: center;
 }
 
 #countrySelect {
-    width: 200px;
-    margin: 0 auto;
+    height: 2em;
+    background-color: var(--vanilla);
+    color: var(--prussian-blue);
+    width: 80%;
+    padding-left: 1em;
+    border: 2px solid var(--orange-wheel);
+}
+
+.leaflet-touch .leaflet-control-layers,
+.leaflet-touch .leaflet-bar {
+    border: none;
+}
+
+.leaflet-touch .leaflet-bar a {
+    /* center icons */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.2em;
+    height: 2.2em;
+    border: 2px solid var(--fire-engine-red);
+    background-color: var(--xanthous);
+    opacity: .8;
+    /* color: var(--prussian-blue); */
+}
+
+.leaflet-bar a:hover {
+    opacity: 1;
+    border: 2px solid var(--orange-wheel);
+    background-color: var(--fire-engine-red);
+}
+
+.leaflet-control-zoom-in {
+    margin: 2.2em 2.2em 1em 1em;
+}
+
+.leaflet-control-zoom-out {
+    margin: 1em 2.2em 2.2em 1em;
 }
