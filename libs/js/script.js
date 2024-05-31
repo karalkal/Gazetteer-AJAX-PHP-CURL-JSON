@@ -66,6 +66,7 @@ $(document).ready(function () {
 	});
 
 
+
 	/*
 	create marker and circle with default values, 
 	if user allows location set it to location values, 
@@ -86,12 +87,29 @@ $(document).ready(function () {
 		map.panTo([latlng.lat, latlng.lng])
 	}	
 	*/
-
+	// 	{
+	// 		icon:      "fa-solid fa-money-check-dollar",               // and define its properties
+	// 		title:     "financial"
+	// } 
 	// info buttons
-	var infoBtn = L.easyButton("fa-info", function (btn, map) {
+	L.easyButton('fa-globe', function (btn, map) {
+		helloPopup.setLatLng(map.getCenter()).openOn(map);
+	}).addTo(map);
+
+	const infoBtn1 = L.easyButton("fa-info", function (btn, map) {
 		$("#exampleModal").modal("show");
+		$(".infoBtn1").attr("infoBtn1", "BTN_1");
+		$(".infoBtn1").attr("infoBtn1", "button1");
+
 	});
-	infoBtn.addTo(map);
+	infoBtn1.addTo(map);
+	const infoBtn2 = L.easyButton("fa-solid fa-money-check-dollar", function (btn, map) {
+		$("#exampleModal").modal("show");
+		$(".infoBtn1").attr("infoBtn1", "BTN_1");
+		$(".infoBtn1").attr("infoBtn1", "button1");
+
+	});
+	infoBtn2.addTo(map);
 
 })
 
