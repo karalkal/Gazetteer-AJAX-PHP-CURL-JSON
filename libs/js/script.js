@@ -61,10 +61,10 @@ $(document).ready(function () {
 
 	// Enable selection of country from menu
 	$("#countrySelect").on("change", () => {
-		const countryCode = $("#countrySelect").val();
-		centerMapOnSelectedCountry(countryCode);
+		const [countryCodeIso2, countryCodeIso3] = $("#countrySelect").val().split("|");
+		// console.log(countryCodeIso2, countryCodeIso3)
+		centerMapOnSelectedCountry(countryCodeIso2);
 	});
-
 
 
 	/*
@@ -87,7 +87,7 @@ $(document).ready(function () {
 		map.panTo([latlng.lat, latlng.lng])
 	}	
 	*/
-	
+
 	// info buttons
 	const infoBtn1 = L.easyButton({
 		leafletClasses: true,
@@ -120,10 +120,9 @@ function loadAllCountriesData() {
 
 		success: function (result) {
 			$.each(result.data.allCountriesArr, function (index, value) {
-				// console.log(index, value)
 				$('#countrySelect')
 					.append($("<option></option>")
-						.attr("value", value.iso_a2)
+						.attr("value", `${value.iso_a2}|${value.iso_a3} `)
 						.text(value.name));
 			});
 
@@ -135,12 +134,12 @@ function loadAllCountriesData() {
 	});
 }
 
-function centerMapOnSelectedCountry(countryCode) {		// get country boundaries, remove prev. polygon and center map
+function centerMapOnSelectedCountry(countryCodeIso2) {		// get country boundaries, remove prev. polygon and center map
 	$.ajax({
 		url: "libs/php/getCountryBoundaries.php",
 		type: 'GET',
 		dataType: 'json',
-		data: ({ countryCode: countryCode }),
+		data: ({ countryCode: countryCodeIso2 }),
 
 		success: function (result) {
 			// NB - we need latlng arrays but the STUPID json is providing longitude first, then latitude, hence need to invert them
