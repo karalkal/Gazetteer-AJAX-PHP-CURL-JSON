@@ -87,30 +87,28 @@ $(document).ready(function () {
 		map.panTo([latlng.lat, latlng.lng])
 	}	
 	*/
-	// 	{
-	// 		icon:      "fa-solid fa-money-check-dollar",               // and define its properties
-	// 		title:     "financial"
-	// } 
+	
 	// info buttons
-	L.easyButton('fa-globe', function (btn, map) {
-		helloPopup.setLatLng(map.getCenter()).openOn(map);
-	}).addTo(map);
-
-	const infoBtn1 = L.easyButton("fa-info", function (btn, map) {
-		$("#exampleModal").modal("show");
-		$(".infoBtn1").attr("infoBtn1", "BTN_1");
-		$(".infoBtn1").attr("infoBtn1", "button1");
-
+	const infoBtn1 = L.easyButton({
+		leafletClasses: true,
+		states: [{
+			title: 'Government',
+			icon: 'fa-solid fa-landmark-flag',
+			onClick: function (btn, map) { $("#exampleModal").modal("show") }
+		}]
 	});
+
+	const infoBtn2 = L.easyButton({
+		leafletClasses: true,
+		states: [{
+			title: 'Financial',
+			icon: 'fa-solid fa-money-check-dollar',
+			onClick: function (btn, map) { $("#exampleModal").modal("show") }
+		}]
+	});
+
 	infoBtn1.addTo(map);
-	const infoBtn2 = L.easyButton("fa-solid fa-money-check-dollar", function (btn, map) {
-		$("#exampleModal").modal("show");
-		$(".infoBtn1").attr("infoBtn1", "BTN_1");
-		$(".infoBtn1").attr("infoBtn1", "button1");
-
-	});
 	infoBtn2.addTo(map);
-
 })
 
 
