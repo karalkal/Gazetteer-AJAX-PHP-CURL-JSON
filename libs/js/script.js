@@ -39,9 +39,8 @@ const overlayMaps = {
 
 L.control.layers(baseMaps, overlayMaps).addTo(map);
 
-
 $(document).ready(function () {
-	loadCountriesNamesAndCodes();			// Load Counties as <select> options
+	countries = loadCountriesNamesAndCodes();			// Load Counties as <select> options
 	let [countryCodeIso2, countryCodeIso3] = ["GR", "GRC"]		// default country set to Greece
 	/**	Set initial location:
 		if user opts in => get latlng from event, send request to get countryCode and display map
@@ -94,7 +93,6 @@ $(document).ready(function () {
 			title: 'Government',
 			icon: 'fa-solid fa-landmark-flag',
 			onClick: async function (btn, map) {
-				console.log(countryCodeIso2, countryCodeIso3)
 				getCountryData(countryCodeIso3);
 				$("#exampleModal").modal("show")
 			}
@@ -125,7 +123,7 @@ function loadCountriesNamesAndCodes() {
 			$.each(result.data.allCountriesArr, function (index, value) {
 				$('#countrySelect')
 					.append($("<option></option>")
-						.attr("value", `${value.iso_a2}|${value.iso_a3} `)
+						.attr("value", `${value.iso_a2}|${value.iso_a3}`)
 						.text(value.name));
 			});
 
@@ -192,9 +190,17 @@ function setCountryOfLocation(e) {
 		},
 
 		success: function (result) {
-			let iso2Code = result.data.countryCode
-			console.log(countryCodeIso2, countryCodeIso3)
+			const iso2Code = result.data.countryCode;
+			// need to get iso3 code too to get country info from 'https://countryinfoapi.com/api/countries/{cca3}
+			let iso3Code;
+			$("option").each(function () {
+				if (($(this).val().split("|")[0]) === iso2Code) {
+					iso3Code = ($(this).val().split("|")[1]);
+				}
+			});
+
 			centerMapOnSelectedCountry(iso2Code);
+			getCountryData(iso3Code);
 		},
 
 		error: function (jqXHR, textStatus, errorThrown) {
