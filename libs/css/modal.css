@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700;1,400;1,700&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+/* arvo (slab) weight 400 and 700, normal and italic */
+
+/* CSS HEX */
+:root {
+    --font-main: : "Arvo", serif;
+    --font-display: "Open Sans", sans-serif;
+
+    --prussian-blue: hsla(201, 100%, 14%, 1);
+    --fire-engine-red: hsla(0, 69%, 50%, 1);
+    --orange-wheel: hsla(31, 100%, 48%, 1);
+    --xanthous: hsla(40, 97%, 64%, 1);
+    --vanilla: hsla(51, 55%, 82%, 1);
+}
+
+
+* {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    vertical-align: baseline;
+}
+
+img {
+    width: 33%;
+}

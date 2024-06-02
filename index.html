@@ -30,7 +30,8 @@
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css">
 	<script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
 	<!-- Custom CSS -->
-	<link rel="stylesheet" href="libs/css/styles.css">
+	<link rel="stylesheet" href="libs/css/main.css">
+	<link rel="stylesheet" href="libs/css/modal.css">
 	<link rel="stylesheet" href="libs/css/preloader.css">
 </head>
 
@@ -372,6 +373,41 @@
 							</td>
 
 						</tr>
+					</table>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-outline-success btn-sm" data-bs-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="firstModal" class="modal" data-bs-backdrop="false" tabindex="-1">
+		<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content shadow">
+				<div class="modal-header bg-success bg-gradient text-white">
+					<h5 class="modal-title">Overview</h5>
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<table class="table table-striped">
+						<tr>
+							<td class="text-center"> <i class="fa-solid fa-flag"></i> </td>
+							<td class="text-end" id="countryFlag">
+								<!-- add image here -->
+							</td>
+						</tr>
+
+						<tr>
+							<td class="text-center"> <i class="fa-solid fa-shield"></i> </td>
+							<td class="text-end" id="countryCoatOfArms">
+								<!-- add image here -->
+							</td>
+						</tr>
+
+
+
 					</table>
 				</div>
 				<div class="modal-footer">
