@@ -41,8 +41,8 @@ L.control.layers(baseMaps, overlayMaps).addTo(map);
 
 
 $(document).ready(function () {
-	loadAllCountriesData();			// Load Counties <select> options
-
+	loadCountriesNamesAndCodes();			// Load Counties as <select> options
+	let [countryCodeIso2, countryCodeIso3] = ["GR", "GRC"]		// default country set to Greece
 	/**	Set initial location:
 		if user opts in => get latlng from event, send request to get countryCode and display map
 		if user refuses, display default country map
@@ -51,8 +51,8 @@ $(document).ready(function () {
 	map.once('locationfound', setCountryOfLocation); // gets code AND sets location
 	map.on('locationerror', (e) => {
 		if (e.code === 1) {
-			alert("Default initial map will be set to Greece\n(because this is where it all started).\n:-)");
-			centerMapOnSelectedCountry("GR");
+			// alert("Default initial map will be set to Greece\n(because this is where it all started).\n:-)");
+			centerMapOnSelectedCountry(countryCodeIso2);
 		}
 		else {
 			alert(e.message);
@@ -61,8 +61,7 @@ $(document).ready(function () {
 
 	// Enable selection of country from menu
 	$("#countrySelect").on("change", () => {
-		const [countryCodeIso2, countryCodeIso3] = $("#countrySelect").val().split("|");
-		// console.log(countryCodeIso2, countryCodeIso3)
+		[countryCodeIso2, countryCodeIso3] = $("#countrySelect").val().split("|");
 		centerMapOnSelectedCountry(countryCodeIso2);
 	});
 
@@ -94,7 +93,11 @@ $(document).ready(function () {
 		states: [{
 			title: 'Government',
 			icon: 'fa-solid fa-landmark-flag',
-			onClick: function (btn, map) { $("#exampleModal").modal("show") }
+			onClick: async function (btn, map) {
+				console.log(countryCodeIso2, countryCodeIso3)
+				getCountryData(countryCodeIso3);
+				$("#exampleModal").modal("show")
+			}
 		}]
 	});
 
@@ -112,9 +115,9 @@ $(document).ready(function () {
 })
 
 
-function loadAllCountriesData() {
+function loadCountriesNamesAndCodes() {
 	$.ajax({
-		url: "libs/php/getAllCountriesData.php",
+		url: "libs/php/getAllCountriesCodes.php",
 		type: 'GET',
 		dataType: 'json',
 
@@ -180,7 +183,7 @@ function centerMapOnSelectedCountry(countryCodeIso2) {		// get country boundarie
 function setCountryOfLocation(e) {
 	const { lat, lng } = e.latlng;
 	$.ajax({
-		url: "libs/php/getCountryCode.php",
+		url: "libs/php/getCountryIso2CodeByLatLng.php",
 		type: 'GET',
 		dataType: 'json',
 		data: {
@@ -189,12 +192,32 @@ function setCountryOfLocation(e) {
 		},
 
 		success: function (result) {
-			centerMapOnSelectedCountry(result.data.countryCode);
+			let iso2Code = result.data.countryCode
+			console.log(countryCodeIso2, countryCodeIso3)
+			centerMapOnSelectedCountry(iso2Code);
 		},
 
 		error: function (jqXHR, textStatus, errorThrown) {
 			console.log(jqXHR, textStatus, errorThrown)
 		}
 	});
-
 }
+
+
+function getCountryData(countryCodeIso3) {
+	$.ajax({
+		url: "libs/php/getCountryData.php",
+		type: 'GET',
+		dataType: 'json',
+		data: ({ countryCodeIso3: countryCodeIso3 }),
+
+		success: function (result) {
+			console.log("OPPA", result);
+		},
+
+		error: function (jqXHR, textStatus, errorThrown) {
+			console.log(jqXHR, textStatus, errorThrown)
+		}
+	});
+}
+
