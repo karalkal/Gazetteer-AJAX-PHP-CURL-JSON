@@ -22,6 +22,56 @@
     vertical-align: baseline;
 }
 
-img {
-    width: 33%;
+.modalBG {
+    background-color: var(--xanthous);
+}
+
+.divNames {
+    background-color: var(--vanilla);
+    padding: .4em;
+    margin-bottom: .2em;
+}
+
+.divNames h3,
+.divNames h4 {
+    text-align: center;
+    margin-bottom: 0;
+}
+
+
+
+.divFlagAndCoA {
+    display: flex;
+    background-color: var(--vanilla);
+}
+
+.divFlagAndCoA>div {
+    flex: 1 1 0px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: .2em .4em;
+}
+
+.divFlagAndCoA>div>p {
+    margin-bottom: .4em;
+}
+
+#countryFlag img {
+    width: 52%;
+    margin-top: .2em;
+}
+
+#countryCoatOfArms {
+    aspect-ratio: 1 / 1;
+    width: 46%;
+    padding: 4px
+}
+
+#countryCoatOfArms img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border: 1px solid var(--prussian-blue);
+    padding: .3em;
 }

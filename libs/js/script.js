@@ -198,8 +198,6 @@ $(document).ready(function () {
 				// need to get iso3 code too to get country info from 'https://countryinfoapi.com/api/countries/{cca3}
 				// TODO: refactor it in a more intelligent way
 				$("option").each(function () {
-					console.log(countryIso2)
-
 					if (($(this).val().split("|")[0]) === countryIso2) {
 						countryIso3 = $(this).val().split("|")[1];
 					}
@@ -234,6 +232,8 @@ $(document).ready(function () {
 
 	function renderCountryDataInModal(data) {
 		console.log(data);
+		$("#countryName1").text(data.name);
+		$("#countryName2").text(`(${data.altSpellings[data.altSpellings.length - 1]})`);
 		$("#countryFlag").html(`<img src="${data.flag}"/>`);
 		$("#countryCoatOfArms").html(`<img src="${data.coatOfArms}"/>`);
 	}

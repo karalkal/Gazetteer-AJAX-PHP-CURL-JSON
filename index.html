@@ -384,36 +384,35 @@
 
 	<div id="firstModal" class="modal" data-bs-backdrop="false" tabindex="-1">
 		<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-			<div class="modal-content shadow">
-				<div class="modal-header bg-success bg-gradient text-white">
-					<h5 class="modal-title">Overview</h5>
-					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-						aria-label="Close"></button>
-				</div>
+			<div class="modal-content modalBG">
+				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+					aria-label="Close">Close</button>
 				<div class="modal-body">
-					<table class="table table-striped">
-						<tr>
-							<td class="text-center"> <i class="fa-solid fa-flag"></i> </td>
-							<td class="text-end" id="countryFlag">
+					<div class="divNames">
+						<h3 id="countryName1"></h3>
+						<h4 id="countryName2"></h4>
+					</div>
+
+					<div class="divFlagAndCoA">
+						<div>
+							<p>Flag:</p>
+							<div id="countryFlag">
 								<!-- add image here -->
-							</td>
-						</tr>
+							</div>
+						</div>
 
-						<tr>
-							<td class="text-center"> <i class="fa-solid fa-shield"></i> </td>
-							<td class="text-end" id="countryCoatOfArms">
+						<div>
+							<p>Coat of Arms:</p>
+							<div id="countryCoatOfArms">
 								<!-- add image here -->
-							</td>
-						</tr>
-
-
-
-					</table>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-outline-success btn-sm" data-bs-dismiss="modal">Close</button>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-outline-success btn-sm" data-bs-dismiss="modal">Close</button>
 		</div>
 	</div>
 
