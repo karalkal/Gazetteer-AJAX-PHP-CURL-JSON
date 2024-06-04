@@ -55,9 +55,10 @@ $(document).ready(function () {
 		if (e.code === 1) {
 			// alert("Default initial map will be set to Greece\n(because this is where it all started).\n:-)");
 			centerMapOnSelectedCountry(countryIso2);
-			getCountryData();
+			getEssentialCountryData();
 		}
 		else {
+			console.log(e);
 			alert(e.message);
 		}
 	});
@@ -66,7 +67,7 @@ $(document).ready(function () {
 	$("#countrySelect").on("change", () => {
 		[countryIso2, countryIso3] = $("#countrySelect").val().split("|");
 		centerMapOnSelectedCountry(countryIso2);
-		getCountryData();
+		getEssentialCountryData();
 	});
 
 
@@ -98,7 +99,7 @@ $(document).ready(function () {
 			title: 'Government',
 			icon: 'fa-solid fa-landmark-flag',
 			onClick: async function (btn, map) {
-				getCountryData();
+				getEssentialCountryData();
 				$("#firstModal").modal("show")
 			}
 		}]
@@ -115,6 +116,10 @@ $(document).ready(function () {
 
 	infoBtn1.addTo(map);
 	infoBtn2.addTo(map);
+
+	$(".btnClose").on('click', function () {
+		$("#firstModal").modal("hide")
+	});
 
 
 
@@ -212,9 +217,9 @@ $(document).ready(function () {
 		});
 	}
 
-	function getCountryData() {
+	function getEssentialCountryData() {
 		$.ajax({
-			url: "libs/php/getCountryData.php",
+			url: "libs/php/getEssentialCountryData.php",
 			type: 'GET',
 			dataType: 'json',
 			data: ({ countryCodeIso3: countryIso3 }),

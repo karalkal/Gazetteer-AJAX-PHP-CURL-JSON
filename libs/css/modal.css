@@ -22,7 +22,7 @@
     vertical-align: baseline;
 }
 
-.modalBG {
+.modal-content {
     background-color: var(--xanthous);
 }
 
@@ -47,7 +47,7 @@
     margin-bottom: .2em;
 }
 
-.divTwoCols>.divFlagAndCoA {
+.divTwoCols>div {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -88,4 +88,22 @@
 
 .divCountryInfo p {
     margin-bottom: .2em;
+}
+
+.modal-footer {
+    border-top: 2px solid var(--fire-engine-red);
+}
+
+.btnClose {
+    background-color: var(--vanilla);
+    color: var(--prussian-blue);
+    border: 2px solid var(--orange-wheel);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.1em;
+}
+
+.btnClose:hover {
+    background-color: var(--orange-wheel);
+    border: 2px solid var(--fire-engine-red);
 }
