@@ -55,7 +55,7 @@ $(document).ready(function () {
 		if (e.code === 1) {
 			// alert("Default initial map will be set to Greece\n(because this is where it all started).\n:-)");
 			centerMapOnSelectedCountry(countryIso2);
-			getEssentialCountryData();
+			// getEssentialCountryData();
 		}
 		else {
 			console.log(e);
@@ -67,7 +67,7 @@ $(document).ready(function () {
 	$("#countrySelect").on("change", () => {
 		[countryIso2, countryIso3] = $("#countrySelect").val().split("|");
 		centerMapOnSelectedCountry(countryIso2);
-		getEssentialCountryData();
+		// getEssentialCountryData();
 	});
 
 
@@ -110,7 +110,10 @@ $(document).ready(function () {
 		states: [{
 			title: 'Financial',
 			icon: 'fa-solid fa-money-check-dollar',
-			onClick: function (btn, map) { $("#exampleModal").modal("show") }
+			onClick: async function (btn, map) {
+				// getFinancialData();
+				$("#exampleModal").modal("show")
+			}
 		}]
 	});
 
@@ -120,7 +123,6 @@ $(document).ready(function () {
 	$(".btnClose").on('click', function () {
 		$("#firstModal").modal("hide")
 	});
-
 
 
 	function loadCountriesNamesAndCodes() {
@@ -234,6 +236,23 @@ $(document).ready(function () {
 		});
 	}
 
+	function getFinancialData() {
+		$.ajax({
+			url: "libs/php/getFinancialData.php",
+			type: 'GET',
+			dataType: 'json',
+			data: ({ countryCodeIso3: countryIso3 }),
+
+			success: function (result) {
+				renderCountryDataInModal(result.data);
+			},
+
+			error: function (jqXHR, textStatus, errorThrown) {
+				console.log(jqXHR, textStatus, errorThrown)
+			}
+		});
+	}
+
 
 	function renderCountryDataInModal(data) {
 		console.log(data);
@@ -245,7 +264,6 @@ $(document).ready(function () {
 		$("#countryPopulation").html(`<span>${Intl.NumberFormat('de-DE').format(data.population)}`);
 		$("#countryCapital").html(`<span>${data.capital}</span>`);
 		$("#countryTLD").html(`<span>${data.tld}</span>`);
-
 	}
 
 
