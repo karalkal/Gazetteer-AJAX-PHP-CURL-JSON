@@ -55,7 +55,6 @@ $(document).ready(function () {
 		if (e.code === 1) {
 			// alert("Default initial map will be set to Greece\n(because this is where it all started).\n:-)");
 			centerMapOnSelectedCountry(countryIso2);
-			// getEssentialCountryData();
 		}
 		else {
 			console.log(e);
@@ -67,7 +66,6 @@ $(document).ready(function () {
 	$("#countrySelect").on("change", () => {
 		[countryIso2, countryIso3] = $("#countrySelect").val().split("|");
 		centerMapOnSelectedCountry(countryIso2);
-		// getEssentialCountryData();
 	});
 
 
@@ -100,7 +98,7 @@ $(document).ready(function () {
 			icon: 'fa-solid fa-landmark-flag',
 			onClick: async function (btn, map) {
 				getEssentialCountryData();
-				$("#firstModal").modal("show")
+				$("#genericModal").modal("show")
 			}
 		}]
 	});
@@ -111,8 +109,8 @@ $(document).ready(function () {
 			title: 'Financial',
 			icon: 'fa-solid fa-money-check-dollar',
 			onClick: async function (btn, map) {
-				// getFinancialData();
-				$("#exampleModal").modal("show")
+				getFinancialData();
+				$("#genericModal").modal("show")
 			}
 		}]
 	});
@@ -121,7 +119,7 @@ $(document).ready(function () {
 	infoBtn2.addTo(map);
 
 	$(".btnClose").on('click', function () {
-		$("#firstModal").modal("hide")
+		$("#genericModal").modal("hide")
 	});
 
 
@@ -227,7 +225,7 @@ $(document).ready(function () {
 			data: ({ countryCodeIso3: countryIso3 }),
 
 			success: function (result) {
-				renderCountryDataInModal(result.data);
+				renderCountryDataInModal(result.data, "essential");
 			},
 
 			error: function (jqXHR, textStatus, errorThrown) {
@@ -238,13 +236,14 @@ $(document).ready(function () {
 
 	function getFinancialData() {
 		$.ajax({
-			url: "libs/php/getFinancialData.php",
+			// url: "libs/php/getFinancialData.php",
+			url: "libs/php/getEssentialCountryData.php",
 			type: 'GET',
 			dataType: 'json',
 			data: ({ countryCodeIso3: countryIso3 }),
 
 			success: function (result) {
-				renderCountryDataInModal(result.data);
+				renderCountryDataInModal(result.data, "financial");
 			},
 
 			error: function (jqXHR, textStatus, errorThrown) {
@@ -254,18 +253,54 @@ $(document).ready(function () {
 	}
 
 
-	function renderCountryDataInModal(data) {
-		console.log(data);
-		$("#countryName1").text(data.name);
-		$("#countryName2").text(`(${data.altSpellings[data.altSpellings.length - 1]})`);
-		$("#countryFlag").html(`<img src="${data.flag}"/>`);
-		$("#countryCoatOfArms").html(`<img src="${data.coatOfArms}"/>`);
-		$("#countryArea").html(`<span>${Intl.NumberFormat('de-DE').format(data.area)} km&#178;</span>`);
-		$("#countryPopulation").html(`<span>${Intl.NumberFormat('de-DE').format(data.population)}`);
-		$("#countryCapital").html(`<span>${data.capital}</span>`);
-		$("#countryTLD").html(`<span>${data.tld}</span>`);
-	}
+	function renderCountryDataInModal(data, dataType) {
+		if (dataType === "essential") {
+			console.log(dataType, data);
+			$(".modal-body").html(
+				`<div class="divNames">
+					<h3 id="countryName1"><span>${data.name}</span></h3>
+					<h4 id="countryName2"><span>(${data.altSpellings[data.altSpellings.length - 1]})</h4>
+				</div>
 
+				<div class="divTwoCols">
+					<div class="divFlagAndCoA">
+						<p>Flag:</p>
+						<div id="countryFlag"><img src="${data.flag}"></div>
+					</div>
+					<div class="divFlagAndCoA">
+						<p>Coat of Arms:</p>
+						<div id="countryCoatOfArms"><img src="${data.coatOfArms}"></div>
+					</div>
+				</div>
+
+				<div class="divTwoCols">
+					<div class="divCountryInfo">
+						<p>Area:</p>
+						<p id="countryArea"><span>${Intl.NumberFormat('de-DE').format(data.area)} km&#178;</span></p>
+					</div>
+					<div class="divCountryInfo">
+						<p>Population:</p>
+						<p id="countryPopulation"><span>${Intl.NumberFormat('de-DE').format(data.population)}</span></p>
+					</div>
+				</div>
+
+				<div class="divTwoCols">
+					<div class="divCountryInfo">
+						<p>Capital:</p>
+						<p id="countryCapital"><span>${data.capital}</span></p>
+					</div>
+					<div class="divCountryInfo">
+						<p>TLD:</p>
+						<p id="countryTLD"><span>${data.tld}</span></p>
+					</div>
+				</div>`
+			)
+		}
+
+		else if (dataType === "financial") {
+			console.log(dataType, data);
+		}
+	}
 
 	// end of $(document).ready(function {
 })
