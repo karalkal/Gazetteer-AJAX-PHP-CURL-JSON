@@ -22,6 +22,11 @@
     vertical-align: baseline;
 }
 
+body {
+    font-family: var(--font-main) !important;
+    font-weight: 400 !important;
+}
+
 #map {
     width: 100%;
     height: 100vh;
@@ -45,6 +50,8 @@
     width: 80%;
     padding-left: 1em;
     border: 2px solid var(--orange-wheel);
+    font-family: var(--font-display);
+    font-weight: 700;
 }
 
 .leaflet-touch .leaflet-bar {
