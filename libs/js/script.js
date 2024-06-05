@@ -97,7 +97,7 @@ $(document).ready(function () {
 			title: 'Government',
 			icon: 'fa-solid fa-landmark-flag',
 			onClick: async function (btn, map) {
-				getEssentialCountryData();
+				getEssentials();
 				$("#genericModal").modal("show")
 			}
 		}]
@@ -109,7 +109,7 @@ $(document).ready(function () {
 			title: 'Financial',
 			icon: 'fa-solid fa-money-check-dollar',
 			onClick: async function (btn, map) {
-				getFinancialData();
+				getEconomy();
 				$("#genericModal").modal("show")
 			}
 		}]
@@ -217,7 +217,7 @@ $(document).ready(function () {
 		});
 	}
 
-	function getEssentialCountryData() {
+	function getEssentials() {
 		$.ajax({
 			url: "libs/php/getEssentialCountryData.php",
 			type: 'GET',
@@ -234,13 +234,15 @@ $(document).ready(function () {
 		});
 	}
 
-	function getFinancialData() {
+	function getEconomy() {
 		$.ajax({
-			// url: "libs/php/getFinancialData.php",
-			url: "libs/php/getEssentialCountryData.php",
+			url: "libs/php/getFinancialData.php",
 			type: 'GET',
 			dataType: 'json',
-			data: ({ countryCodeIso3: countryIso3 }),
+			data: ({
+				countryCodeIso3: countryIso3,
+				timeFrame: "2020:2024"
+			}),
 
 			success: function (result) {
 				renderCountryDataInModal(result.data, "financial");

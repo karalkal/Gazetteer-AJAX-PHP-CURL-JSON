@@ -7,8 +7,10 @@ error_reporting(E_ALL);
 
 $executionStartTime = microtime(true);
 
-// $url = 'https://restcountries.com/v3.1/alpha/' . $_REQUEST['countryCodeIso3'];
-$url = 'https://countryinfoapi.com/api/countries/' . $_REQUEST['countryCodeIso3'];
+$url = 'http://api.worldbank.org/v2/country/' . $_REQUEST['countryCodeIso3'] .
+    '/indicator/BN.CAB.XOKA.CD;BM.GSR.GNFS.CD;BX.GSR.GNFS.CD;NY.GDP.MKTP.KD.ZG;NY.GDP.MKTP.CD;NY.GDP.PCAP.KD.ZG;NY.GDP.PCAP.KD.ZG' .
+    '?source=2&format=json&date=' . $_REQUEST['timeFrame'] . '&per_page=200';        // request up to 200 results in one page just in case
+
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -20,6 +22,7 @@ $resultJson = curl_exec($ch);
 curl_close($ch);
 
 $decodedData = json_decode($resultJson, true);
+// print_r($decodedData);
 
 $output['status']['code'] = "200";
 $output['status']['name'] = "ok";
