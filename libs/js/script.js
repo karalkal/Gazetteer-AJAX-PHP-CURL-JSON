@@ -299,35 +299,35 @@ $(document).ready(function () {
 		}
 
 		else if (dataType === "financial") {
-			console.log("Actual Data:\n", data[1]);
-			const actualData = data[1];
-			let mostRecentData = {};
+			// console.log("Actual Data:\n", data[1]);
+			const actualData = data[1] || [];		// avoid error for countries with no data, i.e. North Cyprus
+			let mostRecentData = {		// default values for required indicators
+				"BN.CAB.XOKA.CD": { value: "N.A.", year: "no recent data is available" },
+				"BM.GSR.GNFS.CD": { value: "N.A.", year: "no recent data is available" },
+				"BX.GSR.GNFS.CD": { value: "N.A.", year: "no recent data is available" },
+				"NY.GDP.MKTP.KD.ZG": { value: "N.A.", year: "no recent data is available" },
+				"NY.GDP.MKTP.CD": { value: "N.A.", year: "no recent data is available" },
+				"NY.GDP.PCAP.KD.ZG": { value: "N.A.", year: "no recent data is available" },
+			};
 			for (let reading of actualData) {
 				mostRecentData.countryId = reading.country.id;
-				mostRecentData.countryName = reading.country.value
+				mostRecentData.countryName = reading.country.value;
 				// For each indicator API returns the most recent data as first result
-				// Hence if year is no longer "N.A." we already have record => ignore next readings for this indicator
+				// Hence if value in mostRecentData is no longer "N.A." we already have record => ignore next readings for this indicator
 				// Sometimes value === null, write data only of value is not null. Get year of reading as well
-				if (!(mostRecentData.hasOwnProperty(reading.indicator.id)) && reading.value) {
+				if (mostRecentData[reading.indicator.id].value === "N.A." && reading.value) {
 					mostRecentData[reading.indicator.id] = {
-						indicator: reading.indicator,
+						indicatorName: reading.indicator.value,
 						year: reading.date,
 						value: reading.value
 					};
 				};
 			}
-			console.log("mostRecentData:\n", mostRecentData);
-
-			// check for null values and if any replace with generic string
-
-
-
-
-
+			// console.log("mostRecentData:\n", mostRecentData);
 
 			$(".modal-body").html(`
 				<div class="divNames">
-					<h4 id="countryName2">${mostRecentData.countryName} (${mostRecentData.countryId})</h4>
+					<h4 id="countryName2">${mostRecentData.countryName || "Country not in DB"} (${mostRecentData.countryId || "N.A."})</h4>
 				</div>
 
 				<div class="divOneCol">
@@ -340,14 +340,14 @@ $(document).ready(function () {
 				<div class="divOneCol">
 					<p>GDP growth (annual %):</p>
 					<p class="countryData">
-					${mostRecentData["NY.GDP.MKTP.KD.ZG"].value} 
+					${Number(mostRecentData["NY.GDP.MKTP.KD.ZG"].value)} 
 					<span class="dataYear">(${mostRecentData["NY.GDP.MKTP.KD.ZG"].year})</span>
 					</p>
 				</div>
 				<div class="divOneCol">
 					<p>GDP per capita growth (annual %):</p>
 					<p class="countryData">
-					${mostRecentData["NY.GDP.PCAP.KD.ZG"].value} 
+					${Number(mostRecentData["NY.GDP.PCAP.KD.ZG"].value)} 
 					<span class="dataYear">(${mostRecentData["NY.GDP.PCAP.KD.ZG"].year})</span>
 					</p>
 				</div>
