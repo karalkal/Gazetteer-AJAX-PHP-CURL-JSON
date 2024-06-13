@@ -39,6 +39,21 @@
     font-family: var(--font-display);
 }
 
+.divOneCol {
+    display: block;
+    background-color: var(--vanilla);
+    margin-bottom: .2em;
+    padding: .2em .4em;
+}
+
+.divOneCol>p {
+    margin-bottom: .2em;
+}
+
+.divOneCol>p:last-child {
+    text-align: right;
+}
+
 .divTwoCols {
     display: grid;
     grid-auto-columns: minmax(0, 1fr);
@@ -80,7 +95,13 @@
 .countryData {
     font-family: var(--font-display);
     font-size: 1.25em;
-    font-weight: 600;
+    font-weight: 700;
+}
+
+.countryData .dataYear {
+    font-size: .8em;
+    font-weight: 500;
+    font-style: italic;
 }
 
 .divCountryInfo p {

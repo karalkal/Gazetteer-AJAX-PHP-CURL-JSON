@@ -259,8 +259,8 @@ $(document).ready(function () {
 		if (dataType === "essential") {
 			$(".modal-body").html(`
 				<div class="divNames">
-					<h3 id="countryName1"><span>${data.name}</span></h3>
-					<h4 id="countryName2"><span>(${data.altSpellings[data.altSpellings.length - 1]})</h4>
+					<h3 id="countryName1">${data.name}</h3>
+					<h4 id="countryName2">(${data.altSpellings[data.altSpellings.length - 1]})</h4>
 				</div>
 
 				<div class="divTwoCols">
@@ -292,47 +292,86 @@ $(document).ready(function () {
 					</div>
 					<div class="divCountryInfo">
 						<p>TLD:</p>
-						<p class="countryData"><span>${data.tld}</span></p>
+						<p class="countryData"><span>${data.tld}</p>
 					</div>
 				</div>
 				`)
 		}
 
 		else if (dataType === "financial") {
-			// console.log("Actual Data:\n", data[1]);
+			console.log("Actual Data:\n", data[1]);
 			const actualData = data[1];
 			let mostRecentData = {};
 			for (let reading of actualData) {
 				mostRecentData.countryId = reading.country.id;
 				mostRecentData.countryName = reading.country.value
-				// Check if indicator already exists, API returns first one as most recent for each indicator,
-				// thus ensuring if key already exists in obj we already have the most recent reading. Get year of reading as well
-				if (!(mostRecentData.hasOwnProperty(reading.indicator.id))) {
+				// For each indicator API returns the most recent data as first result
+				// Hence if year is no longer "N.A." we already have record => ignore next readings for this indicator
+				// Sometimes value === null, write data only of value is not null. Get year of reading as well
+				if (!(mostRecentData.hasOwnProperty(reading.indicator.id)) && reading.value) {
 					mostRecentData[reading.indicator.id] = {
-						data: reading.indicator,
+						indicator: reading.indicator,
 						year: reading.date,
+						value: reading.value
 					};
-
 				};
 			}
 			console.log("mostRecentData:\n", mostRecentData);
-			console.log(mostRecentData.hasOwnProperty("BN.CAB.XOKA.CD"))
+
+			// check for null values and if any replace with generic string
+
+
+
+
 
 
 			$(".modal-body").html(`
 				<div class="divNames">
-					<h3 id="countryName1"><span>${mostRecentData.countryName}</span></h3>
-					<h4 id="countryName2"><span>(${mostRecentData.countryId})</h4>
+					<h4 id="countryName2">${mostRecentData.countryName} (${mostRecentData.countryId})</h4>
 				</div>
 
-				<div class="divTwoCols">
-					<p>Capital:</p>
-					<p id="countryCapital"><span>${data.capital}</span></p>
+				<div class="divOneCol">
+					<p>GDP (current US$):</p>
+					<p class="countryData">
+					${Intl.NumberFormat('de-DE').format(mostRecentData["NY.GDP.MKTP.CD"].value)} 
+					<span class="dataYear">(${mostRecentData["NY.GDP.MKTP.CD"].year})</span>
+					</p>
 				</div>
-				<div class="divTwoCols">
-					<p>TLD:</p>
-					<p id="countryTLD"><span>${data.tld}</span></p>
+				<div class="divOneCol">
+					<p>GDP growth (annual %):</p>
+					<p class="countryData">
+					${mostRecentData["NY.GDP.MKTP.KD.ZG"].value} 
+					<span class="dataYear">(${mostRecentData["NY.GDP.MKTP.KD.ZG"].year})</span>
+					</p>
 				</div>
+				<div class="divOneCol">
+					<p>GDP per capita growth (annual %):</p>
+					<p class="countryData">
+					${mostRecentData["NY.GDP.PCAP.KD.ZG"].value} 
+					<span class="dataYear">(${mostRecentData["NY.GDP.PCAP.KD.ZG"].year})</span>
+					</p>
+				</div>
+				<div class="divOneCol">
+					<p>Imports of goods and services (BoP, current US$):</p>
+					<p class="countryData">
+					${Intl.NumberFormat('de-DE').format(mostRecentData["BM.GSR.GNFS.CD"].value)} 
+					<span class="dataYear">(${mostRecentData["BM.GSR.GNFS.CD"].year})</span>
+					</p>
+				</div>
+				<div class="divOneCol">
+					<p>Exports of goods and services (BoP, current US$):</p>
+					<p class="countryData">
+					${Intl.NumberFormat('de-DE').format(mostRecentData["BX.GSR.GNFS.CD"].value)} 
+					<span class="dataYear">(${mostRecentData["BX.GSR.GNFS.CD"].year})</span>
+					</p>
+				</div>
+				<div class="divOneCol">
+					<p>Current account balance (BoP, current US$):</p>
+					<p class="countryData">
+					${Intl.NumberFormat('de-DE').format(mostRecentData["BN.CAB.XOKA.CD"].value)} 
+					<span class="dataYear">(${mostRecentData["BN.CAB.XOKA.CD"].year})</span>
+					</p>
+				</div>				
 				`)
 		}
 	}
