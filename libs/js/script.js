@@ -299,39 +299,39 @@ $(document).ready(function () {
 		}
 
 		else if (dataType === "financial") {
-			console.log("Actual Data:\n", data[1]);
+			// console.log("Actual Data:\n", data[1]);
 			const actualData = data[1];
 			let mostRecentData = {};
 			for (let reading of actualData) {
+				mostRecentData.countryId = reading.country.id;
+				mostRecentData.countryName = reading.country.value
 				// Check if indicator already exists, API returns first one as most recent for each indicator,
-				// thus ensuring if key already exists in obj we already have the most recent reading. Get year/name as well
-				if (!(reading.indicator.id in Object.keys(mostRecentData))) {
+				// thus ensuring if key already exists in obj we already have the most recent reading. Get year of reading as well
+				if (!(mostRecentData.hasOwnProperty(reading.indicator.id))) {
 					mostRecentData[reading.indicator.id] = {
 						data: reading.indicator,
 						year: reading.date,
 					};
 
-					mostRecentData.countryId = reading.country.id;
-					mostRecentData.countryName = reading.country.value
 				};
 			}
 			console.log("mostRecentData:\n", mostRecentData);
+			console.log(mostRecentData.hasOwnProperty("BN.CAB.XOKA.CD"))
+
+
 			$(".modal-body").html(`
 				<div class="divNames">
 					<h3 id="countryName1"><span>${mostRecentData.countryName}</span></h3>
 					<h4 id="countryName2"><span>(${mostRecentData.countryId})</h4>
-
 				</div>
 
 				<div class="divTwoCols">
-					<div class="divCountryInfo">
-						<p>Capital:</p>
-						<p id="countryCapital"><span>${data.capital}</span></p>
-					</div>
-					<div class="divCountryInfo">
-						<p>TLD:</p>
-						<p id="countryTLD"><span>${data.tld}</span></p>
-					</div>
+					<p>Capital:</p>
+					<p id="countryCapital"><span>${data.capital}</span></p>
+				</div>
+				<div class="divTwoCols">
+					<p>TLD:</p>
+					<p id="countryTLD"><span>${data.tld}</span></p>
 				</div>
 				`)
 		}
