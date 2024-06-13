@@ -77,12 +77,9 @@
     padding: .3em;
 }
 
-#countryArea,
-#countryPopulation,
-#countryCapital,
-#countryTLD {
+.countryData {
     font-family: var(--font-display);
-    font-size: 1.1em;
+    font-size: 1.25em;
     font-weight: 600;
 }
 

@@ -257,9 +257,8 @@ $(document).ready(function () {
 
 	function renderCountryDataInModal(data, dataType) {
 		if (dataType === "essential") {
-			console.log(dataType, data);
-			$(".modal-body").html(
-				`<div class="divNames">
+			$(".modal-body").html(`
+				<div class="divNames">
 					<h3 id="countryName1"><span>${data.name}</span></h3>
 					<h4 id="countryName2"><span>(${data.altSpellings[data.altSpellings.length - 1]})</h4>
 				</div>
@@ -278,12 +277,50 @@ $(document).ready(function () {
 				<div class="divTwoCols">
 					<div class="divCountryInfo">
 						<p>Area:</p>
-						<p id="countryArea"><span>${Intl.NumberFormat('de-DE').format(data.area)} km&#178;</span></p>
+						<p class="countryData"><span>${Intl.NumberFormat('de-DE').format(data.area)} km&#178;</span></p>
 					</div>
 					<div class="divCountryInfo">
 						<p>Population:</p>
-						<p id="countryPopulation"><span>${Intl.NumberFormat('de-DE').format(data.population)}</span></p>
+						<p class="countryData"><span>${Intl.NumberFormat('de-DE').format(data.population)}</span></p>
 					</div>
+				</div>
+
+				<div class="divTwoCols">
+					<div class="divCountryInfo">
+						<p>Capital:</p>
+						<p class="countryData"><span>${data.capital}</span></p>
+					</div>
+					<div class="divCountryInfo">
+						<p>TLD:</p>
+						<p class="countryData"><span>${data.tld}</span></p>
+					</div>
+				</div>
+				`)
+		}
+
+		else if (dataType === "financial") {
+			console.log("Actual Data:\n", data[1]);
+			const actualData = data[1];
+			let mostRecentData = {};
+			for (let reading of actualData) {
+				// Check if indicator already exists, API returns first one as most recent for each indicator,
+				// thus ensuring if key already exists in obj we already have the most recent reading. Get year/name as well
+				if (!(reading.indicator.id in Object.keys(mostRecentData))) {
+					mostRecentData[reading.indicator.id] = {
+						data: reading.indicator,
+						year: reading.date,
+					};
+
+					mostRecentData.countryId = reading.country.id;
+					mostRecentData.countryName = reading.country.value
+				};
+			}
+			console.log("mostRecentData:\n", mostRecentData);
+			$(".modal-body").html(`
+				<div class="divNames">
+					<h3 id="countryName1"><span>${mostRecentData.countryName}</span></h3>
+					<h4 id="countryName2"><span>(${mostRecentData.countryId})</h4>
+
 				</div>
 
 				<div class="divTwoCols">
@@ -295,12 +332,8 @@ $(document).ready(function () {
 						<p>TLD:</p>
 						<p id="countryTLD"><span>${data.tld}</span></p>
 					</div>
-				</div>`
-			)
-		}
-
-		else if (dataType === "financial") {
-			console.log(dataType, data);
+				</div>
+				`)
 		}
 	}
 
