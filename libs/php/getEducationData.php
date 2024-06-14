@@ -14,7 +14,7 @@ $executionStartTime = microtime(true);
 
 $url = 'http://api.worldbank.org/v2/country/' . $_REQUEST['countryCodeIso3'] .
     '/indicator/SE.XPD.TOTL.GD.ZS;SE.PRM.ENRL.TC.ZS;SE.PRM.NENR;SE.SEC.NENR;SL.UEM.TOTL.FE.ZS;SL.UEM.TOTL.MA.ZS;SL.TLF.0714.ZS;EN.POP.SLUM.UR.ZS' .
-    '?source=2&format=json&date=' . $_REQUEST['timeFrame'] . '&per_page=200';        // request up to 200 results in one page just in case
+    '?source=2&format=json&date=' . $_REQUEST['timeFrame'] . '&per_page=400';        // request up to 200 results in one page just in case
 
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);

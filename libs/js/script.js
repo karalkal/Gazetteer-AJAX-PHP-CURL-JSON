@@ -325,8 +325,8 @@ $(document).ready(function () {
 		if (dataType === "essential") {
 			$(".modal-body").html(`
 				<div class="divNames">
-					<h3 id="countryName1">${data.name}</h3>
-					<h4 id="countryName2">(${data.altSpellings[data.altSpellings.length - 1]})</h4>
+					<h3>${data.name}</h3>
+					<h4>(${data.altSpellings[data.altSpellings.length - 1]})</h4>
 				</div>
 
 				<div class="divTwoCols">
@@ -393,7 +393,7 @@ $(document).ready(function () {
 
 			$(".modal-body").html(`
 				<div class="divNames">
-					<h4 id="countryName2">${mostRecentData.countryName || "Country not in DB"} (${mostRecentData.countryId || "N.A."})</h4>
+					<h5>${mostRecentData.countryName || "Country not in DB"} - Economy</h5>
 				</div>
 
 				<div class="divOneCol">
@@ -471,7 +471,7 @@ $(document).ready(function () {
 			}
 			$(".modal-body").html(`
 				<div class="divNames">
-					<h4 id="countryName2">${mostRecentData.countryName || "Country not in DB"} (${mostRecentData.countryId || "N.A."})</h4>
+					<h5>${mostRecentData.countryName || "Country not in DB"} - Demographics</h5>
 				</div>
 
 				<div class="divOneCol">
@@ -563,7 +563,7 @@ $(document).ready(function () {
 			}
 			$(".modal-body").html(`
 				<div class="divNames">
-					<h4 id="countryName2">${mostRecentData.countryName || "Country not in DB"} (${mostRecentData.countryId || "N.A."})</h4>
+					<h5>${mostRecentData.countryName || "Country not in DB"} - Education</h5>
 				</div>
 
 				<div class="divOneCol">
