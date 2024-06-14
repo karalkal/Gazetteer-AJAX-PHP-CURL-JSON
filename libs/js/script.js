@@ -106,7 +106,7 @@ $(document).ready(function () {
 	const infoBtn2 = L.easyButton({
 		leafletClasses: true,
 		states: [{
-			title: 'Financial',
+			title: 'Economy',
 			icon: 'fa-solid fa-money-check-dollar',
 			onClick: async function (btn, map) {
 				getEconomy();
@@ -115,8 +115,21 @@ $(document).ready(function () {
 		}]
 	});
 
+	const infoBtn3 = L.easyButton({
+		leafletClasses: true,
+		states: [{
+			title: 'Population',
+			icon: 'fa-solid fa-people-roof',
+			onClick: async function (btn, map) {
+				getPopulation();
+				$("#genericModal").modal("show")
+			}
+		}]
+	});
+
 	infoBtn1.addTo(map);
 	infoBtn2.addTo(map);
+	infoBtn3.addTo(map);
 
 	$(".btnClose").on('click', function () {
 		$("#genericModal").modal("hide")
@@ -253,6 +266,25 @@ $(document).ready(function () {
 			}
 		});
 	}
+	function getPopulation() {
+		$.ajax({
+			url: "libs/php/getPopulationData.php",
+			type: 'GET',
+			dataType: 'json',
+			data: ({
+				countryCodeIso3: countryIso3,
+				timeFrame: "2020:2024"
+			}),
+
+			success: function (result) {
+				renderCountryDataInModal(result.data, "population");
+			},
+
+			error: function (jqXHR, textStatus, errorThrown) {
+				console.log(jqXHR, textStatus, errorThrown)
+			}
+		});
+	}
 
 
 	function renderCountryDataInModal(data, dataType) {
@@ -374,6 +406,101 @@ $(document).ready(function () {
 				</div>				
 				`)
 		}
+
+		else if (dataType === "population") {
+			console.log("Actual Data:\n", data[1]);
+			const actualData = data[1] || [];		// avoid error for countries with no data, i.e. North Cyprus
+			let mostRecentData = {		// default values for required indicators
+				"SP.DYN.LE00.MA.IN": { value: "N.A.", year: "no recent data is available" },	// "Life expectancy at birth, male (years)"
+				"SP.DYN.LE00.FE.IN": { value: "N.A.", year: "no recent data is available" },	// "Life expectancy at birth, female (years)"
+				"EN.POP.DNST": { value: "N.A.", year: "no recent data is available" },			// "Population density (people per sq. km of land area)"
+				"SP.POP.GROW": { value: "N.A.", year: "no recent data is available" },			// "Population growth (annual %)"
+				"SP.URB.TOTL.IN.ZS": { value: "N.A.", year: "no recent data is available" },	// "Urban population (% of total population)"
+				"SP.RUR.TOTL.ZS": { value: "N.A.", year: "no recent data is available" },		// "Rural population (% of total population)"
+				"SP.POP.TOTL": { value: "N.A.", year: "no recent data is available" },			// "Population, total"
+				"AG.LND.TOTL.K2": { value: "N.A.", year: "no recent data is available" },		// "Land area (sq. km)"
+				// "SE.ENR.PRSC.FM.ZS": { value: "N.A.", year: "no recent data is available" },	// "School enrollment, primary and secondary (gross), gender parity index (GPI)"
+			};
+			for (let reading of actualData) {
+				mostRecentData.countryId = reading.country.id;
+				mostRecentData.countryName = reading.country.value;
+				// For each indicator API returns the most recent data as first result
+				// Hence if value in mostRecentData is no longer "N.A." we already have record => ignore next readings for this indicator
+				// Sometimes value === null, write data only of value is not null. Get year of reading as well
+				if (mostRecentData[reading.indicator.id].value === "N.A." && reading.value) {
+					mostRecentData[reading.indicator.id] = {
+						indicatorName: reading.indicator.value,
+						year: reading.date,
+						value: reading.value
+					};
+				};
+			}
+			// console.log("mostRecentData:\n", mostRecentData);
+
+			$(".modal-body").html(`
+				<div class="divNames">
+					<h4 id="countryName2">${mostRecentData.countryName || "Country not in DB"} (${mostRecentData.countryId || "N.A."})</h4>
+				</div>
+
+				<div class="divOneCol">
+					<p>Population, total:</p>
+					<p class="countryData">
+					${Intl.NumberFormat('de-DE').format(mostRecentData["SP.POP.TOTL"].value)} 
+					<span class="dataYear">(${mostRecentData["SP.POP.TOTL"].year})</span>
+					</p>
+				</div>
+				<div class="divOneCol">
+					<p>Land area (sq. km):</p>
+					<p class="countryData">
+					${Intl.NumberFormat('de-DE').format(mostRecentData["AG.LND.TOTL.K2"].value)} 
+					<span class="dataYear">(${mostRecentData["AG.LND.TOTL.K2"].year})</span>
+					</p>
+				</div>
+				<div class="divOneCol">
+					<p>Population density (people per sq. km of land area):</p>
+					<p class="countryData">
+					${Number(mostRecentData["EN.POP.DNST"].value)} 
+					<span class="dataYear">(${mostRecentData["EN.POP.DNST"].year})</span>
+					</p>
+				</div>
+				<div class="divOneCol">
+					<p>Population growth (annual %):</p>
+					<p class="countryData">
+					${Number(mostRecentData["SP.POP.GROW"].value)} 
+					<span class="dataYear">(${mostRecentData["SP.POP.GROW"].year})</span>
+					</p>
+				</div>
+				<div class="divOneCol">
+					<p>Urban population (% of total population):</p>
+					<p class="countryData">
+					${Number(mostRecentData["SP.URB.TOTL.IN.ZS"].value)} 
+					<span class="dataYear">(${mostRecentData["SP.URB.TOTL.IN.ZS"].year})</span>
+					</p>
+				</div>
+				<div class="divOneCol">
+					<p>Rural population (% of total population):</p>
+					<p class="countryData">
+					${Number(mostRecentData["SP.RUR.TOTL.ZS"].value)} 
+					<span class="dataYear">(${mostRecentData["SP.RUR.TOTL.ZS"].year})</span>
+					</p>
+				</div>
+				<div class="divOneCol">
+					<p>Life expectancy at birth, male (years):</p>
+					<p class="countryData">
+					${Number(mostRecentData["SP.DYN.LE00.MA.IN"].value)} 
+					<span class="dataYear">(${mostRecentData["SP.DYN.LE00.MA.IN"].year})</span>
+					</p>
+				</div>	
+				<div class="divOneCol">
+					<p>Life expectancy at birth, female (years):</p>
+					<p class="countryData">
+					${Number(mostRecentData["SP.DYN.LE00.FE.IN"].value)} 
+					<span class="dataYear">(${mostRecentData["SP.DYN.LE00.FE.IN"].year})</span>
+					</p>
+				</div>				
+				`)
+		}
+
 	}
 
 	// end of $(document).ready(function {
