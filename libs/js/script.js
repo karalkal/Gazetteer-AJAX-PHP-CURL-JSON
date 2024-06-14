@@ -69,26 +69,26 @@ $(document).ready(function () {
 	});
 
 
-	/*
-	create marker and circle with default values, 
-	if user allows location set it to location values, 
-	then when marker is moved set to new values
+
+	// create marker and circle with default values, 
+	// if user allows location set it to location values, 
+	// then when marker is moved set to new values
 	var marker = L.marker([0, 0],
 		{ draggable: true })
 		.addTo(map);
-		
+
 	// on click map
 	map.on('click', (e) => displayMap(e.latlng));
 	// on drag marker
 	marker.on('dragend', (e) => displayMap(e.target.getLatLng()));
-		
+
 	function displayMap(latlng) {
 		// console.log(latlng)
 		marker.setLatLng(latlng)
 			.bindPopup(`lat: ${latlng.lat}, <br>lng: ${latlng.lng}`).openPopup();
 		map.panTo([latlng.lat, latlng.lng])
-	}	
-	*/
+	}
+
 
 	// info buttons
 	const infoBtn1 = L.easyButton({
@@ -139,10 +139,23 @@ $(document).ready(function () {
 		}]
 	});
 
+	const infoBtn5 = L.easyButton({
+		leafletClasses: true,
+		states: [{
+			title: 'Currency',
+			icon: 'fa-solid fa-money-bill-transfer',
+			onClick: async function (btn, map) {
+				getExchangeRates();
+				$("#genericModal").modal("show")
+			}
+		}]
+	});
+
 	infoBtn1.addTo(map);
 	infoBtn2.addTo(map);
 	infoBtn3.addTo(map);
 	infoBtn4.addTo(map);
+	infoBtn5.addTo(map);
 
 	$(".btnClose").on('click', function () {
 		$("#genericModal").modal("hide")
@@ -312,6 +325,26 @@ $(document).ready(function () {
 
 			success: function (result) {
 				renderCountryDataInModal(result.data, "education");
+			},
+
+			error: function (jqXHR, textStatus, errorThrown) {
+				console.log(jqXHR, textStatus, errorThrown)
+			}
+		});
+	}
+
+	function getExchangeRates() {
+		$.ajax({
+			url: "libs/php/getExchangeRatesData.php",
+			type: 'GET',
+			dataType: 'json',
+			data: ({
+				countryCodeIso2: countryIso2,
+			}),
+
+			success: function (result) {
+				// renderCountryDataInModal(result.data, "money");
+				console.log(result);
 			},
 
 			error: function (jqXHR, textStatus, errorThrown) {

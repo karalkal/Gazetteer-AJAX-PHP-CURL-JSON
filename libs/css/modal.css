@@ -40,6 +40,11 @@
     margin-bottom: 0;
 }
 
+.divNames h4 {
+    font-family: "Oswald", sans-serif;
+    font-weight: 400 !important;
+}
+
 .divOneCol {
     display: block;
     background-color: var(--vanilla);
