@@ -119,9 +119,21 @@ $(document).ready(function () {
 		leafletClasses: true,
 		states: [{
 			title: 'Population',
-			icon: 'fa-solid fa-people-roof',
+			icon: 'fa-solid fa-people-group',
 			onClick: async function (btn, map) {
 				getPopulation();
+				$("#genericModal").modal("show")
+			}
+		}]
+	});
+
+	const infoBtn4 = L.easyButton({
+		leafletClasses: true,
+		states: [{
+			title: 'Education',
+			icon: 'fa-solid fa-person-chalkboard',
+			onClick: async function (btn, map) {
+				getEducation();
 				$("#genericModal").modal("show")
 			}
 		}]
@@ -130,6 +142,7 @@ $(document).ready(function () {
 	infoBtn1.addTo(map);
 	infoBtn2.addTo(map);
 	infoBtn3.addTo(map);
+	infoBtn4.addTo(map);
 
 	$(".btnClose").on('click', function () {
 		$("#genericModal").modal("hide")
@@ -249,7 +262,7 @@ $(document).ready(function () {
 
 	function getEconomy() {
 		$.ajax({
-			url: "libs/php/getFinancialData.php",
+			url: "libs/php/getEconomyData.php",
 			type: 'GET',
 			dataType: 'json',
 			data: ({
@@ -258,7 +271,7 @@ $(document).ready(function () {
 			}),
 
 			success: function (result) {
-				renderCountryDataInModal(result.data, "financial");
+				renderCountryDataInModal(result.data, "economy");
 			},
 
 			error: function (jqXHR, textStatus, errorThrown) {
@@ -266,6 +279,7 @@ $(document).ready(function () {
 			}
 		});
 	}
+
 	function getPopulation() {
 		$.ajax({
 			url: "libs/php/getPopulationData.php",
@@ -278,6 +292,26 @@ $(document).ready(function () {
 
 			success: function (result) {
 				renderCountryDataInModal(result.data, "population");
+			},
+
+			error: function (jqXHR, textStatus, errorThrown) {
+				console.log(jqXHR, textStatus, errorThrown)
+			}
+		});
+	}
+
+	function getEducation() {
+		$.ajax({
+			url: "libs/php/getEducationData.php",
+			type: 'GET',
+			dataType: 'json',
+			data: ({
+				countryCodeIso3: countryIso3,
+				timeFrame: "1991:2024"			// for education since 1991, as less data is available
+			}),
+
+			success: function (result) {
+				renderCountryDataInModal(result.data, "education");
 			},
 
 			error: function (jqXHR, textStatus, errorThrown) {
@@ -330,7 +364,7 @@ $(document).ready(function () {
 				`)
 		}
 
-		else if (dataType === "financial") {
+		else if (dataType === "economy") {
 			// console.log("Actual Data:\n", data[1]);
 			const actualData = data[1] || [];		// avoid error for countries with no data, i.e. North Cyprus
 			let mostRecentData = {		// default values for required indicators
@@ -408,7 +442,7 @@ $(document).ready(function () {
 		}
 
 		else if (dataType === "population") {
-			console.log("Actual Data:\n", data[1]);
+			// console.log("Actual Data:\n", data[1]);
 			const actualData = data[1] || [];		// avoid error for countries with no data, i.e. North Cyprus
 			let mostRecentData = {		// default values for required indicators
 				"SP.DYN.LE00.MA.IN": { value: "N.A.", year: "no recent data is available" },	// "Life expectancy at birth, male (years)"
@@ -435,8 +469,6 @@ $(document).ready(function () {
 					};
 				};
 			}
-			// console.log("mostRecentData:\n", mostRecentData);
-
 			$(".modal-body").html(`
 				<div class="divNames">
 					<h4 id="countryName2">${mostRecentData.countryName || "Country not in DB"} (${mostRecentData.countryId || "N.A."})</h4>
@@ -457,7 +489,7 @@ $(document).ready(function () {
 					</p>
 				</div>
 				<div class="divOneCol">
-					<p>Population density (people per sq. km of land area):</p>
+					<p>Population density (people/sq.km):</p>
 					<p class="countryData">
 					${Number(mostRecentData["EN.POP.DNST"].value)} 
 					<span class="dataYear">(${mostRecentData["EN.POP.DNST"].year})</span>
@@ -471,31 +503,123 @@ $(document).ready(function () {
 					</p>
 				</div>
 				<div class="divOneCol">
-					<p>Urban population (% of total population):</p>
+					<p>Urban population (%):</p>
 					<p class="countryData">
 					${Number(mostRecentData["SP.URB.TOTL.IN.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["SP.URB.TOTL.IN.ZS"].year})</span>
 					</p>
 				</div>
 				<div class="divOneCol">
-					<p>Rural population (% of total population):</p>
+					<p>Rural population (%):</p>
 					<p class="countryData">
 					${Number(mostRecentData["SP.RUR.TOTL.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["SP.RUR.TOTL.ZS"].year})</span>
 					</p>
 				</div>
 				<div class="divOneCol">
-					<p>Life expectancy at birth, male (years):</p>
+					<p>Life expectancy, male (years):</p>
 					<p class="countryData">
 					${Number(mostRecentData["SP.DYN.LE00.MA.IN"].value)} 
 					<span class="dataYear">(${mostRecentData["SP.DYN.LE00.MA.IN"].year})</span>
 					</p>
 				</div>	
 				<div class="divOneCol">
-					<p>Life expectancy at birth, female (years):</p>
+					<p>Life expectancy, female (years):</p>
 					<p class="countryData">
 					${Number(mostRecentData["SP.DYN.LE00.FE.IN"].value)} 
 					<span class="dataYear">(${mostRecentData["SP.DYN.LE00.FE.IN"].year})</span>
+					</p>
+				</div>				
+				`)
+		}
+
+		else if (dataType === "education") {
+			console.log("Actual Data:\n", data[1]);
+			const actualData = data[1] || [];		// avoid error for countries with no data, i.e. North Cyprus
+			let mostRecentData = {		// default values for required indicators
+				"SE.XPD.TOTL.GD.ZS": { value: "N.A.", year: "no recent data is available" },	// "Government expenditure on education, total (% of GDP)"
+				"SE.PRM.ENRL.TC.ZS": { value: "N.A.", year: "no recent data is available" },	// "Pupil-teacher ratio, primary"
+				"SE.PRM.NENR": { value: "N.A.", year: "no recent data is available" },			// "School enrollment, primary (% net)"
+				"SE.SEC.NENR": { value: "N.A.", year: "no recent data is available" },			// "School enrollment, secondary (% net)"
+				"SL.UEM.TOTL.FE.ZS": { value: "N.A.", year: "no recent data is available" },	// "Unemployment, female (% of female labor force) (modeled ILO estimate)"
+				"SL.UEM.TOTL.MA.ZS": { value: "N.A.", year: "no recent data is available" },	// "Unemployment, male (% of male labor force) (modeled ILO estimate)"
+				"SL.TLF.0714.ZS": { value: "N.A.", year: "no recent data is available" },		// "Children in employment, total (% of children ages 7-14)"
+				"EN.POP.SLUM.UR.ZS": { value: "N.A.", year: "no recent data is available" },	// "Population living in slums (% of urban population)"
+			};
+			for (let reading of actualData) {
+				mostRecentData.countryId = reading.country.id;
+				mostRecentData.countryName = reading.country.value;
+				console.log(reading)
+				// For each indicator API returns the most recent data as first result
+				// Hence if value in mostRecentData is no longer "N.A." we already have record => ignore next readings for this indicator
+				// Sometimes value === null, write data only of value is not null. Get year of reading as well
+				if (mostRecentData[reading.indicator.id].value === "N.A." && reading.value) {
+					mostRecentData[reading.indicator.id] = {
+						indicatorName: reading.indicator.value,
+						year: reading.date,
+						value: reading.value
+					};
+				};
+			}
+			$(".modal-body").html(`
+				<div class="divNames">
+					<h4 id="countryName2">${mostRecentData.countryName || "Country not in DB"} (${mostRecentData.countryId || "N.A."})</h4>
+				</div>
+
+				<div class="divOneCol">
+					<p>Government expenditure on education, total (% of GDP):</p>
+					<p class="countryData">
+					${Number(mostRecentData["SE.XPD.TOTL.GD.ZS"].value)} 
+					<span class="dataYear">(${mostRecentData["SE.XPD.TOTL.GD.ZS"].year})</span>
+					</p>
+				</div>
+				<div class="divOneCol">
+					<p>Pupil-teacher ratio, primary:</p>
+					<p class="countryData">
+					${Number(mostRecentData["SE.PRM.ENRL.TC.ZS"].value)} 
+					<span class="dataYear">(${mostRecentData["SE.PRM.ENRL.TC.ZS"].year})</span>
+					</p>
+				</div>
+				<div class="divOneCol">
+					<p>School enrollment, primary (% net):</p>
+					<p class="countryData">
+					${Number(mostRecentData["SE.PRM.NENR"].value)} 
+					<span class="dataYear">(${mostRecentData["SE.PRM.NENR"].year})</span>
+					</p>
+				</div>
+				<div class="divOneCol">
+					<p>School enrollment, secondary (% net):</p>
+					<p class="countryData">
+					${Number(mostRecentData["SE.SEC.NENR"].value)} 
+					<span class="dataYear">(${mostRecentData["SE.SEC.NENR"].year})</span>
+					</p>
+				</div>
+				<div class="divOneCol">
+					<p>Unemployment, female (%):</p>
+					<p class="countryData">
+					${Number(mostRecentData["SL.UEM.TOTL.FE.ZS"].value)} 
+					<span class="dataYear">(${mostRecentData["SL.UEM.TOTL.FE.ZS"].year})</span>
+					</p>
+				</div>
+				<div class="divOneCol">
+					<p>Unemployment, male (%):</p>
+					<p class="countryData">
+					${Number(mostRecentData["SL.UEM.TOTL.MA.ZS"].value)} 
+					<span class="dataYear">(${mostRecentData["SL.UEM.TOTL.MA.ZS"].year})</span>
+					</p>
+				</div>
+				<div class="divOneCol">
+					<p>Children in employment, (% of age 7-14):</p>
+					<p class="countryData">
+					${Number(mostRecentData["SL.TLF.0714.ZS"].value)} 
+					<span class="dataYear">(${mostRecentData["SL.TLF.0714.ZS"].year})</span>
+					</p>
+				</div>	
+				<div class="divOneCol">
+					<p>Population in slums (%):</p>
+					<p class="countryData">
+					${Number(mostRecentData["EN.POP.SLUM.UR.ZS"].value)} 
+					<span class="dataYear">(${mostRecentData["EN.POP.SLUM.UR.ZS"].year})</span>
 					</p>
 				</div>				
 				`)
