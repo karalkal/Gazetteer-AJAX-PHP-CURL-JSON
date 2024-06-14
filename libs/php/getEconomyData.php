@@ -9,9 +9,9 @@ $executionStartTime = microtime(true);
 
 // Requesting (6 properties): GDP (current US$), GDP growth (annual %), GDP per capita growth (annual %), 
 // Imports of goods and services (BoP, current US$), Exports of goods and services (BoP, current US$), Current account balance (BoP, current US$)
-// (NOT in same order) "BN.CAB.XOKA.CD", "BM.GSR.GNFS.CD",  "BX.GSR.GNFS.CD", "NY.GDP.MKTP.KD.ZG", "NY.GDP.MKTP.CD", "NY.GDP.PCAP.KD.ZG"
+// Population below national poverty line (%), Gini index
 $url = 'http://api.worldbank.org/v2/country/' . $_REQUEST['countryCodeIso3'] .
-    '/indicator/BN.CAB.XOKA.CD;BM.GSR.GNFS.CD;BX.GSR.GNFS.CD;NY.GDP.MKTP.KD.ZG;NY.GDP.MKTP.CD;NY.GDP.PCAP.KD.ZG;NY.GDP.PCAP.KD.ZG' .
+    '/indicator/BN.CAB.XOKA.CD;BM.GSR.GNFS.CD;BX.GSR.GNFS.CD;NY.GDP.MKTP.KD.ZG;NY.GDP.MKTP.CD;NY.GDP.PCAP.KD.ZG;NY.GDP.PCAP.KD.ZG;SI.POV.NAHC;SI.POV.GINI' .
     '?source=2&format=json&date=' . $_REQUEST['timeFrame'] . '&per_page=200';        // request up to 200 results in one page just in case
 
 $ch = curl_init();

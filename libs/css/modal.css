@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700;1,400;1,700&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
-/* arvo (slab) weight 400 and 700, normal and italic */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Oswald:wght@200..700&display=swap');
+
 
 /* CSS HEX */
 :root {
-    --font-main: : "Arvo", serif;
-    --font-display: "Open Sans", sans-serif;
+    --font-main: "Open Sans", sans-serif;
+    --font-condensed: : "Oswald", sans-serif;
 
     --prussian-blue: hsla(201, 100%, 14%, 1);
     --fire-engine-red: hsla(0, 69%, 50%, 1);
@@ -38,7 +38,6 @@
 .divNames h5 {
     text-align: center;
     margin-bottom: 0;
-    font-family: var(--font-display);
 }
 
 .divOneCol {
@@ -95,7 +94,6 @@
 }
 
 .countryData {
-    font-family: var(--font-display);
     font-size: 1.16em;
     font-weight: 600;
 }
@@ -108,7 +106,6 @@
 
 .divCountryInfo p {
     margin-bottom: .2em;
-    font-family: var(--font-display);
 }
 
 .modal-footer {
@@ -119,7 +116,7 @@
     background-color: var(--vanilla);
     color: var(--prussian-blue);
     border: 2px solid var(--orange-wheel);
-    font-family: var(--font-display);
+    font-family: var(--font-main);
     font-weight: 700;
     font-size: 1.1em;
 }

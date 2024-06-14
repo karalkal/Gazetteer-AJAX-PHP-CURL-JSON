@@ -267,7 +267,7 @@ $(document).ready(function () {
 			dataType: 'json',
 			data: ({
 				countryCodeIso3: countryIso3,
-				timeFrame: "2020:2024"
+				timeFrame: "2006:2024"
 			}),
 
 			success: function (result) {
@@ -287,7 +287,7 @@ $(document).ready(function () {
 			dataType: 'json',
 			data: ({
 				countryCodeIso3: countryIso3,
-				timeFrame: "2020:2024"
+				timeFrame: "2006:2024"
 			}),
 
 			success: function (result) {
@@ -307,7 +307,7 @@ $(document).ready(function () {
 			dataType: 'json',
 			data: ({
 				countryCodeIso3: countryIso3,
-				timeFrame: "1991:2024"			// for education since 1991, as less data is available
+				timeFrame: "1991:2024"			// get education since 1991, as less data is available
 			}),
 
 			success: function (result) {
@@ -322,6 +322,7 @@ $(document).ready(function () {
 
 
 	function renderCountryDataInModal(data, dataType) {
+		//    ****    GOVERNMENT    ****    //
 		if (dataType === "essential") {
 			$(".modal-body").html(`
 				<div class="divNames">
@@ -363,7 +364,7 @@ $(document).ready(function () {
 				</div>
 				`)
 		}
-
+		//    ****    ECONOMY    ****    //
 		else if (dataType === "economy") {
 			// console.log("Actual Data:\n", data[1]);
 			const actualData = data[1] || [];		// avoid error for countries with no data, i.e. North Cyprus
@@ -374,6 +375,8 @@ $(document).ready(function () {
 				"NY.GDP.MKTP.KD.ZG": { value: "N.A.", year: "no recent data is available" },
 				"NY.GDP.MKTP.CD": { value: "N.A.", year: "no recent data is available" },
 				"NY.GDP.PCAP.KD.ZG": { value: "N.A.", year: "no recent data is available" },
+				"SI.POV.NAHC": { value: "N.A.", year: "no recent data is available" },			//Population below national poverty line (%)
+				"SI.POV.GINI": { value: "N.A.", year: "no recent data is available" },			//Gini
 			};
 			for (let reading of actualData) {
 				mostRecentData.countryId = reading.country.id;
@@ -385,7 +388,7 @@ $(document).ready(function () {
 					mostRecentData[reading.indicator.id] = {
 						indicatorName: reading.indicator.value,
 						year: reading.date,
-						value: reading.value
+						value: Number(reading.value).toFixed(2)
 					};
 				};
 			}
@@ -437,10 +440,24 @@ $(document).ready(function () {
 					${Intl.NumberFormat('de-DE').format(mostRecentData["BN.CAB.XOKA.CD"].value)} 
 					<span class="dataYear">(${mostRecentData["BN.CAB.XOKA.CD"].year})</span>
 					</p>
+				</div>
+				<div class="divOneCol">
+					<p>Population below national poverty line (%):</p>
+					<p class="countryData">
+					${Number(mostRecentData["SI.POV.NAHC"].value)} 
+					<span class="dataYear">(${mostRecentData["SI.POV.NAHC"].year})</span>
+					</p>
+				</div>
+				<div class="divOneCol">
+					<p>Gini index:</p>
+					<p class="countryData">
+					${Number(mostRecentData["SI.POV.GINI"].value)} 
+					<span class="dataYear">(${mostRecentData["SI.POV.GINI"].year})</span>
+					</p>
 				</div>				
 				`)
 		}
-
+		//    ****    DEMOGRAPHICS    ****    //
 		else if (dataType === "population") {
 			// console.log("Actual Data:\n", data[1]);
 			const actualData = data[1] || [];		// avoid error for countries with no data, i.e. North Cyprus
@@ -453,7 +470,6 @@ $(document).ready(function () {
 				"SP.RUR.TOTL.ZS": { value: "N.A.", year: "no recent data is available" },		// "Rural population (% of total population)"
 				"SP.POP.TOTL": { value: "N.A.", year: "no recent data is available" },			// "Population, total"
 				"AG.LND.TOTL.K2": { value: "N.A.", year: "no recent data is available" },		// "Land area (sq. km)"
-				// "SE.ENR.PRSC.FM.ZS": { value: "N.A.", year: "no recent data is available" },	// "School enrollment, primary and secondary (gross), gender parity index (GPI)"
 			};
 			for (let reading of actualData) {
 				mostRecentData.countryId = reading.country.id;
@@ -465,7 +481,7 @@ $(document).ready(function () {
 					mostRecentData[reading.indicator.id] = {
 						indicatorName: reading.indicator.value,
 						year: reading.date,
-						value: reading.value
+						value: Number(reading.value).toFixed(2)
 					};
 				};
 			}
@@ -549,7 +565,6 @@ $(document).ready(function () {
 			for (let reading of actualData) {
 				mostRecentData.countryId = reading.country.id;
 				mostRecentData.countryName = reading.country.value;
-				console.log(reading)
 				// For each indicator API returns the most recent data as first result
 				// Hence if value in mostRecentData is no longer "N.A." we already have record => ignore next readings for this indicator
 				// Sometimes value === null, write data only of value is not null. Get year of reading as well
@@ -557,7 +572,7 @@ $(document).ready(function () {
 					mostRecentData[reading.indicator.id] = {
 						indicatorName: reading.indicator.value,
 						year: reading.date,
-						value: reading.value
+						value: Number(reading.value).toFixed(2)
 					};
 				};
 			}
