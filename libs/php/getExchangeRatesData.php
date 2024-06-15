@@ -26,6 +26,7 @@ $output['status']['name'] = "ok";
 $output['status']['description'] = "success";
 
 $output['data']['primaryCurrency'] = $decodedData[0]['currencies'];
+$output['data']['countryName'] = $decodedData[0]['name']['common'];       // need it for modal header
 
 $currencyCode = array_keys($decodedData[0]['currencies'])[0];
 
@@ -61,5 +62,3 @@ $output['status']['returnedIn'] = intval((microtime(true) - $executionStartTime)
 header('Content-Type: application/json; charset=UTF-8');
 
 echo json_encode($output);
-
-?>

@@ -5,13 +5,11 @@ const Stadia_AlidadeSatellite = L.tileLayer('https://tiles.stadiamaps.com/tiles/
 	ext: 'jpg'
 });
 
-
 const Jawg_Terrain = L.tileLayer('https://tile.jawg.io/jawg-terrain/{z}/{x}/{y}{r}.png?access-token={accessToken}', {
 	maxZoom: 22,
 	attribution: '<a href="https://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 	accessToken: 'mJZnCYHFpNftBsC6PF64A1V0f7vwRW5xneYEg4rRfMoZimE53hjq2wJUuG1btLQ4'
 });
-
 
 const OpenStreetMap_HOT = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
 	maxZoom: 22,
@@ -67,8 +65,6 @@ $(document).ready(function () {
 		[countryIso2, countryIso3] = $("#countrySelect").val().split("|");
 		centerMapOnSelectedCountry(countryIso2);
 	});
-
-
 
 	// create marker and circle with default values, 
 	// if user allows location set it to location values, 
@@ -154,7 +150,7 @@ $(document).ready(function () {
 	const infoBtn6 = L.easyButton({
 		leafletClasses: true,
 		states: [{
-			title: 'Currency',
+			title: 'Climate',
 			icon: 'fa-solid fa-temperature-three-quarters',
 			onClick: async function (btn, map) {
 				getExchangeRates();
@@ -262,7 +258,6 @@ $(document).ready(function () {
 
 				centerMapOnSelectedCountry(countryIso2);
 			},
-
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown)
 			}
@@ -279,7 +274,6 @@ $(document).ready(function () {
 			success: function (result) {
 				renderCountryDataInModal(result.data, "essential");
 			},
-
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown)
 			}
@@ -299,7 +293,6 @@ $(document).ready(function () {
 			success: function (result) {
 				renderCountryDataInModal(result.data, "economy");
 			},
-
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown)
 			}
@@ -319,7 +312,6 @@ $(document).ready(function () {
 			success: function (result) {
 				renderCountryDataInModal(result.data, "population");
 			},
-
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown)
 			}
@@ -339,7 +331,6 @@ $(document).ready(function () {
 			success: function (result) {
 				renderCountryDataInModal(result.data, "education");
 			},
-
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown)
 			}
@@ -356,17 +347,13 @@ $(document).ready(function () {
 			}),
 
 			success: function (result) {
-				// renderCountryDataInModal(result.data, "money");
-				console.log(result.data);
-				console.log(Object.keys(result.data.primaryCurrency));
+				renderCountryDataInModal(result.data, "money");
 			},
-
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown)
 			}
 		});
 	}
-
 
 	function renderCountryDataInModal(data, dataType) {
 		//    ****    GOVERNMENT    ****    //
@@ -389,27 +376,27 @@ $(document).ready(function () {
 				</div>
 
 				<div class="divTwoCols">
-					<div class="divCountryInfo">
+					<div>
 						<p>Area:</p>
 						<p class="countryData"><span>${Intl.NumberFormat('de-DE').format(data.area)} km&#178;</span></p>
 					</div>
-					<div class="divCountryInfo">
+					<div>
 						<p>Population:</p>
 						<p class="countryData"><span>${Intl.NumberFormat('de-DE').format(data.population)}</span></p>
 					</div>
 				</div>
 
 				<div class="divTwoCols">
-					<div class="divCountryInfo">
+					<div>
 						<p>Capital:</p>
 						<p class="countryData"><span>${data.capital}</span></p>
 					</div>
-					<div class="divCountryInfo">
+					<div>
 						<p>TLD:</p>
 						<p class="countryData"><span>${data.tld}</p>
 					</div>
 				</div>
-				`)
+			`)
 		}
 		//    ****    ECONOMY    ****    //
 		else if (dataType === "economy") {
@@ -595,7 +582,7 @@ $(document).ready(function () {
 				</div>				
 				`)
 		}
-
+		//    ****    EDUCATION    ****    //
 		else if (dataType === "education") {
 			console.log("Actual Data:\n", data[1]);
 			const actualData = data[1] || [];		// avoid error for countries with no data, i.e. North Cyprus
@@ -683,6 +670,104 @@ $(document).ready(function () {
 					${Number(mostRecentData["EN.POP.SLUM.UR.ZS"].value)} 
 					<span class="dataYear">(${mostRecentData["EN.POP.SLUM.UR.ZS"].year})</span>
 					</p>
+				</div>				
+				`)
+		}
+		//    ****    MONEY EXCHANGE    ****    //
+		else if (dataType === "money") {
+			// console.log(data);
+			// console.log(Object.keys(currencyData.primaryCurrency));
+			// console.log(Object.values(currencyData.primaryCurrency));
+			const currencyArr = Object.values(data.primaryCurrency);
+
+			$(".modal-body").html(`
+				<div class="divNames">
+					<h5>${data.countryName || "Country not in DB"} - Money</h5>
+					<h4>${currencyArr[0].name} (${currencyArr[0].symbol})</h4>
+				</div>
+				<div class="divOneCol">
+					<h6>exchange rates as of UTC time</h6>
+					<h6>${data.exchangeRates.time_last_update_utc}</h6>
+				</div>
+				<div class="divTwoColsSplit">
+					<div class="divExchangeRateLeft">
+						<p>Euro (€):</p>
+						<p class="countryData"><span>${data.exchangeRates.conversion_rates.EUR}</span></p>
+					</div>
+					<div class="divExchangeRateRight">
+						<p>US Dollar (US$): </p>
+						<p class="countryData"><span>${data.exchangeRates.conversion_rates.USD}</span></p>
+					</div>
+				</div>
+				<div class="divTwoColsSplit">
+					<div class="divExchangeRateLeft">
+						<p>Japanese yen (¥ / 円):</p>
+						<p class="countryData"><span>${data.exchangeRates.conversion_rates.JPY}</span></p>
+					</div>
+					<div class="divExchangeRateRight">
+						<p>British pound (£):</p>
+						<p class="countryData"><span>${data.exchangeRates.conversion_rates.GBP}</span></p>
+					</div>
+				</div>
+				<div class="divTwoColsSplit">
+					<div class="divExchangeRateLeft">
+						<p>Swiss franc (CHF):</p>
+						<p class="countryData"><span>${data.exchangeRates.conversion_rates.CHF}</span></p>
+					</div>
+					<div class="divExchangeRateRight">					
+						<p>Renminbi (¥ / 元):</p>
+						<p class="countryData"><span>${data.exchangeRates.conversion_rates.CNY}</span></p>
+					</div>
+				</div>
+				<div class="divTwoColsSplit">
+					<div class="divExchangeRateLeft">
+						<p>Australian dollar (A$):</p>
+						<p class="countryData"><span>${data.exchangeRates.conversion_rates.AUD}</span></p>
+					</div>					
+					<div class="divExchangeRateRight">
+						<p>Canadian dollar (C$):</p>
+						<p class="countryData"><span>${data.exchangeRates.conversion_rates.CAD}</span></p>
+					</div>
+				</div>
+				<div class="divTwoColsSplit">
+					<div class="divExchangeRateLeft">
+						<p>Swedish krona (kr):</p>
+						<p class="countryData"><span>${data.exchangeRates.conversion_rates.SEK}</span></p>
+					</div>
+					<div class="divExchangeRateRight">
+						<p>Norwegian krona (kr):</p>
+						<p class="countryData"><span>${data.exchangeRates.conversion_rates.NOK}</span></p>
+					</div>
+				</div>
+				<div class="divTwoColsSplit">
+					<div class="divExchangeRateLeft">
+						<p>Danish krona (kr):</p>
+						<p class="countryData"><span>${data.exchangeRates.conversion_rates.DKK}</span></p>
+					</div>
+					<div class="divExchangeRateRight">
+						<p>Polish złoty (zł):</p>
+						<p class="countryData"><span>${data.exchangeRates.conversion_rates.PLN}</span></p>
+					</div>
+				</div>
+				<div class="divTwoColsSplit">
+					<div class="divExchangeRateLeft">
+						<p>Czech koruna (Kč):</p>
+						<p class="countryData"><span>${data.exchangeRates.conversion_rates.CZK}</span></p>
+					</div>					
+					<div class="divExchangeRateRight">
+						<p>Romanian leu (L):</p>
+						<p class="countryData"><span>${data.exchangeRates.conversion_rates.RON}</span></p>
+					</div>
+				</div>
+				<div class="divTwoColsSplit">
+					<div class="divExchangeRateLeft">
+						<p>Hungarian forint (Ft):</p>
+						<p class="countryData"><span>${data.exchangeRates.conversion_rates.HUF}</span></p>
+					</div>					
+					<div class="divExchangeRateRight">
+						<p>Bulgarian lev (лв):</p>
+						<p class="countryData"><span>${data.exchangeRates.conversion_rates.BGN}</span></p>
+					</div>
 				</div>				
 				`)
 		}

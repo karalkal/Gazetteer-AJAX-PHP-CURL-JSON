@@ -33,16 +33,25 @@
     margin-bottom: .2em;
 }
 
-.divNames h3,
-.divNames h4,
-.divNames h5 {
+h3,
+h4,
+h5 {
     text-align: center;
-    margin-bottom: 0;
+    margin-bottom: .1em;
 }
 
-.divNames h4 {
+h4,
+h6 {
     font-family: "Oswald", sans-serif;
+    margin-bottom: .1em;
+}
+
+h4 {
     font-weight: 400 !important;
+}
+
+h6 {
+    font-weight: 300 !important;
 }
 
 .divOneCol {
@@ -73,6 +82,10 @@
     flex-direction: column;
     justify-content: flex-start;
     padding: .2em .4em;
+}
+
+.divTwoCols>div>p {
+    margin-bottom: .2em;
 }
 
 .divTwoCols>.divFlagAndCoA>p {
@@ -109,8 +122,44 @@
     font-style: italic;
 }
 
-.divCountryInfo p {
+.divTwoColsSplit {
+    display: grid;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
     margin-bottom: .2em;
+    /* background-color: var(--vanilla); */
+    /* color will come from child element */
+}
+
+
+.divTwoColsSplit>.divExchangeRateLeft,
+.divTwoColsSplit>.divExchangeRateRight {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: .2em .4em;
+}
+
+.divTwoColsSplit>.divExchangeRateLeft p,
+.divTwoColsSplit>.divExchangeRateRight p {
+    margin: 0;
+}
+
+.divTwoColsSplit>.divExchangeRateLeft p:first-child,
+.divTwoColsSplit>.divExchangeRateRight p:first-child {
+    font-family: "Oswald", sans-serif;
+    font-weight: 300;
+    /* font-style: oblique; */
+}
+
+.divTwoColsSplit>.divExchangeRateLeft {
+    background-color: var(--vanilla);
+    margin-right: .1em;
+}
+
+.divTwoColsSplit>.divExchangeRateRight {
+    background-color: var(--vanilla);
+    margin-left: .1em;
 }
 
 .modal-footer {
