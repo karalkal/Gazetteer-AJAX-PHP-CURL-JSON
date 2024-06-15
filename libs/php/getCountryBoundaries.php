@@ -10,8 +10,6 @@ $countryCode = $_GET['countryCode'];
 // the other to return just the feature for the selected country so that it can be plotted on the map with L.geoJSON()
 
 $decodedDataArray = json_decode($resultJson, true);
-// echo "\nDECODED:\n";
-// print_r($decodedDataArray['features'][5]);
 
 $coordinatesArray = [];
 foreach ($decodedDataArray['features'] as $countryData) {

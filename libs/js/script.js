@@ -1,4 +1,4 @@
-// tile layers and init
+//   ----    TILE LAYERS and INIT    ----    //
 const Stadia_AlidadeSatellite = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.{ext}', {
 	maxZoom: 22,
 	attribution: '&copy; CNES, Distribution Airbus DS, © Airbus DS, © PlanetObserver (Contains Copernicus Data) | &copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -37,9 +37,19 @@ const overlayMaps = {
 
 L.control.layers(baseMaps, overlayMaps).addTo(map);
 
+//   ----    MARKER    ----    //
+// if user allows location set it to capital, otherwise will be moved to Athens
+// then when marker is moved set to new values
+const marker = L.marker([0, 0], { draggable: true }).addTo(map);
+// move marker on click on map
+map.on('click', (e) => moveMarker(e.latlng));
+// move marker when dragged
+marker.on('dragend', (e) => moveMarker(e.target.getLatLng()));
+
 
 $(document).ready(function () {
-	let [countryIso2, countryIso3] = ["GR", "GRC"]		// default country set to Greece, these values are changed as required
+	let [countryIso2, countryIso3] = ["GR", "GRC"]				// default country set to Greece, these values are changed as required
+	let capitalLatLng = { lat: 37.983810, lng: 23.727539 }		// will place marker on capital, default Athens
 
 	loadCountriesNamesAndCodes();			// Load Counties as <select> options
 
@@ -51,8 +61,9 @@ $(document).ready(function () {
 	map.once('locationfound', setCountryOfLocation); // gets code AND sets location
 	map.on('locationerror', (e) => {
 		if (e.code === 1) {
-			// alert("Default initial map will be set to Greece\n(because this is where it all started).\n:-)");
+			alert("By default map will be set to Greece/Athens\nas this is where IT all started.\n:-)");
 			centerMapOnSelectedCountry(countryIso2);
+			moveMarker(capitalLatLng);
 		}
 		else {
 			console.log(e);
@@ -66,24 +77,6 @@ $(document).ready(function () {
 		centerMapOnSelectedCountry(countryIso2);
 	});
 
-	// create marker and circle with default values, 
-	// if user allows location set it to location values, 
-	// then when marker is moved set to new values
-	var marker = L.marker([0, 0],
-		{ draggable: true })
-		.addTo(map);
-
-	// on click map
-	map.on('click', (e) => displayMap(e.latlng));
-	// on drag marker
-	marker.on('dragend', (e) => displayMap(e.target.getLatLng()));
-
-	function displayMap(latlng) {
-		// console.log(latlng)
-		marker.setLatLng(latlng)
-			.bindPopup(`lat: ${latlng.lat}, <br>lng: ${latlng.lng}`).openPopup();
-		map.panTo([latlng.lat, latlng.lng])
-	}
 
 
 	// info buttons
@@ -150,7 +143,7 @@ $(document).ready(function () {
 	const infoBtn6 = L.easyButton({
 		leafletClasses: true,
 		states: [{
-			title: 'Climate',
+			title: 'Weather in capital',
 			icon: 'fa-solid fa-temperature-three-quarters',
 			onClick: async function (btn, map) {
 				getExchangeRates();
@@ -225,7 +218,7 @@ $(document).ready(function () {
 				let polygon = L.polygon(latlngs, { color: 'green' }).addTo(map);
 				// zoom the map to the polygon
 				map.fitBounds(polygon.getBounds());
-				setTimeout(() => polygon.removeFrom(map), 4400)
+				setTimeout(() => polygon.removeFrom(map), 8000)
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown);
@@ -262,6 +255,14 @@ $(document).ready(function () {
 				console.log(jqXHR, textStatus, errorThrown)
 			}
 		});
+	}
+
+	function moveMarker(latlng) {
+		console.log(latlng)
+		marker
+			.setLatLng(latlng)
+			.bindPopup(`lat: ${latlng.lat}, <br>lng: ${latlng.lng}`).openPopup();
+		map.panTo([latlng.lat, latlng.lng])
 	}
 
 	function getEssentials() {
