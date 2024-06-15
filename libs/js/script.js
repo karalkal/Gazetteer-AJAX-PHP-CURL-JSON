@@ -37,7 +37,7 @@ const overlayMaps = {
 
 L.control.layers(baseMaps, overlayMaps).addTo(map);
 
-//   ----    MARKER    ----    //
+//   ----    MOVEABLE MARKER    ----    //
 // if user allows location set it to capital, otherwise will be moved to Athens
 // then when marker is moved set to new values
 const marker = L.marker([0, 0], { draggable: true }).addTo(map);
@@ -45,6 +45,14 @@ const marker = L.marker([0, 0], { draggable: true }).addTo(map);
 map.on('click', (e) => moveMarker(e.latlng));
 // move marker when dragged
 marker.on('dragend', (e) => moveMarker(e.target.getLatLng()));
+
+function moveMarker(latlng) {
+	console.log(latlng)
+	marker
+		.setLatLng(latlng)
+		.bindPopup(`lat: ${latlng.lat}, <br>lng: ${latlng.lng}`).openPopup();
+	map.panTo([latlng.lat, latlng.lng])
+}
 
 
 $(document).ready(function () {
@@ -75,11 +83,10 @@ $(document).ready(function () {
 	$("#countrySelect").on("change", () => {
 		[countryIso2, countryIso3] = $("#countrySelect").val().split("|");
 		centerMapOnSelectedCountry(countryIso2);
+		setMarkerOnCapitalCoordinates(countryIso2);
 	});
 
-
-
-	// info buttons
+	//   ----    INFO BUTTONS    ----    //
 	const infoBtn1 = L.easyButton({
 		leafletClasses: true,
 		states: [{
@@ -215,8 +222,8 @@ $(document).ready(function () {
 				}
 
 				// polygon is used to determine borders of selected country and then "fill" screen 
-				let polygon = L.polygon(latlngs, { color: 'green' }).addTo(map);
-				// zoom the map to the polygon
+				let polygon = L.polygon(latlngs, { color: 'orange' }).addTo(map);
+				// zoom the map to the polygon, leave it on for some time
 				map.fitBounds(polygon.getBounds());
 				setTimeout(() => polygon.removeFrom(map), 8000)
 			},
@@ -257,12 +264,23 @@ $(document).ready(function () {
 		});
 	}
 
-	function moveMarker(latlng) {
-		console.log(latlng)
-		marker
-			.setLatLng(latlng)
-			.bindPopup(`lat: ${latlng.lat}, <br>lng: ${latlng.lng}`).openPopup();
-		map.panTo([latlng.lat, latlng.lng])
+	function setMarkerOnCapitalCoordinates(countryCodeIso2) {
+		$.ajax({
+			url: "libs/php/getCapitalLatLngByCountryIso2Code.php",
+			type: 'GET',
+			async: false,
+			dataType: 'json',
+			data: { countryCodeIso2 },
+
+			success: function (result) {
+				const capitalCoordinatesArr = result.data.capitalLatLng
+				const capitalCoordinatesObj = { lat: capitalCoordinatesArr[0], lng: capitalCoordinatesArr[1] }
+				moveMarker(capitalCoordinatesObj);
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				console.log(jqXHR, textStatus, errorThrown)
+			}
+		});
 	}
 
 	function getEssentials() {

@@ -7,32 +7,28 @@ error_reporting(E_ALL);
 
 $executionStartTime = microtime(true);
 
-$url = 'http://api.geonames.org/neighboursJSON?country=' . $_REQUEST['country'] . '&username=kurcho';
+// GET primary currency code = if more than one, ignore
+$countryDataUrl = 'https://restcountries.com/v3.1/alpha/' . $_REQUEST['countryCodeIso2'];
 
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_URL, $url);
+curl_setopt($ch, CURLOPT_URL, $countryDataUrl);
 
 $resultJson = curl_exec($ch);
 
 curl_close($ch);
 
-$decodedDataArray = json_decode($resultJson, true);
+$decodedData = json_decode($resultJson, true);
 
 $output['status']['code'] = "200";
 $output['status']['name'] = "ok";
 $output['status']['description'] = "success";
 $output['status']['returnedIn'] = intval((microtime(true) - $executionStartTime) * 1000) . " ms";
-if ($decodedDataArray['totalResultsCount'] > 0) {
-    $output['data'] = $decodedDataArray['geonames'];
-    $output['status']['foundNeighbours'] = true;
-} else {
-    $output['status']['foundNeighbours'] = false;
-}
+
+$output['data']['capitalLatLng'] = $decodedData[0]['capitalInfo']['latlng'];  
+
 
 header('Content-Type: application/json; charset=UTF-8');
 
 echo json_encode($output);
-
-?>
