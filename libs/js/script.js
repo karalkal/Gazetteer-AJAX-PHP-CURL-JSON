@@ -151,11 +151,24 @@ $(document).ready(function () {
 		}]
 	});
 
+	const infoBtn6 = L.easyButton({
+		leafletClasses: true,
+		states: [{
+			title: 'Currency',
+			icon: 'fa-solid fa-temperature-three-quarters',
+			onClick: async function (btn, map) {
+				getExchangeRates();
+				$("#genericModal").modal("show")
+			}
+		}]
+	});
+
 	infoBtn1.addTo(map);
 	infoBtn2.addTo(map);
 	infoBtn3.addTo(map);
 	infoBtn4.addTo(map);
 	infoBtn5.addTo(map);
+	infoBtn6.addTo(map);
 
 	$(".btnClose").on('click', function () {
 		$("#genericModal").modal("hide")
@@ -344,7 +357,8 @@ $(document).ready(function () {
 
 			success: function (result) {
 				// renderCountryDataInModal(result.data, "money");
-				console.log(result);
+				console.log(result.data);
+				console.log(Object.keys(result.data.primaryCurrency));
 			},
 
 			error: function (jqXHR, textStatus, errorThrown) {
