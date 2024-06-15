@@ -7,7 +7,7 @@ error_reporting(E_ALL);
 
 $executionStartTime = microtime(true);
 
-// Requesting (6 properties): GDP (current US$), GDP growth (annual %), GDP per capita growth (annual %), 
+// Requesting (8 properties): GDP (current US$), GDP growth (annual %), GDP per capita growth (annual %), 
 // Imports of goods and services (BoP, current US$), Exports of goods and services (BoP, current US$), Current account balance (BoP, current US$)
 // Population below national poverty line (%), Gini index
 $url = 'http://api.worldbank.org/v2/country/' . $_REQUEST['countryCodeIso3'] .
