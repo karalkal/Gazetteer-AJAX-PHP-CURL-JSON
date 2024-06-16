@@ -8,7 +8,9 @@ error_reporting(E_ALL);
 $executionStartTime = microtime(true);
 
 
-$url = 'http://api.geonames.org/findNearByWeatherJSON?radius=300&lat=' . $_REQUEST['lat'] . '&lng=' . $_REQUEST['lng'] . '&username=kurcho&style=full';
+// NOTE: longitude param is called lon in thi API
+// example URL: https://api.openweathermap.org/data/2.5/weather?appid=cabebd5bf39ecdc54982ba9d45841f89&units=metric&lat=37.98381&lon=23.727539
+$url = 'https://api.openweathermap.org/data/2.5/weather?appid=cabebd5bf39ecdc54982ba9d45841f89&units=metric&lat=' . $_REQUEST['lat'] . '&lon=' . $_REQUEST['lng'];
 
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -19,24 +21,20 @@ $resultJson = curl_exec($ch);
 
 curl_close($ch);
 
-$decodedDataArray = json_decode($resultJson, true);
-// print_r($decode);
+$decodedData = json_decode($resultJson, true);
 
 $output['status']['code'] = "200";
 $output['status']['name'] = "ok";
 $output['status']['description'] = "success";
 $output['status']['returnedIn'] = intval((microtime(true) - $executionStartTime) * 1000) . " ms";
 
-if (array_key_exists('weatherObservation', $decodedDataArray)) {
-    $output['data'] = $decodedDataArray['weatherObservation'];
-    $output['status']['foundWeatherStation'] = true;
-} else {
-    $output['status']['foundWeatherStation'] = false;
-}
+$output['data']['weather'] = $decodedData['weather'];
+$output['data']['main'] = $decodedData['main'];
+$output['data']['wind'] = $decodedData['clouds']['all'];
+$output['data']['sunrise'] = $decodedData['sys']['sunrise'];
+$output['data']['sunset'] = $decodedData['sys']['sunset'];
 
 
 header('Content-Type: application/json; charset=UTF-8');
 
 echo json_encode($output);
-
-?>

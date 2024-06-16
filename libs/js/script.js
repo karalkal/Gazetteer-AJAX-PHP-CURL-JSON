@@ -21,11 +21,8 @@ const OpenRailwayMap = L.tileLayer('https://{s}.tiles.openrailwaymap.org/standar
 	attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | Map style: &copy; <a href="https://www.OpenRailwayMap.org">OpenRailwayMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
 });
 
-
-let map = L.map("map", {
-	layers: [Stadia_AlidadeSatellite, OpenStreetMap_HOT]
-});
-
+// let map = L.map("map");
+let map = L.map("map", { layers: [OpenStreetMap_HOT] });
 
 const baseMaps = { 		// last one in list will be displayed by default on initial render
 	"Satelite (Stadia)": Stadia_AlidadeSatellite, "Terrain (Jawg Lab)": Jawg_Terrain, "General (OpenStreetMap)": OpenStreetMap_HOT
@@ -42,16 +39,19 @@ L.control.layers(baseMaps, overlayMaps).addTo(map);
 // then when marker is moved set to new values
 const marker = L.marker([0, 0], { draggable: true }).addTo(map);
 // move marker on click on map
-map.on('click', (e) => moveMarker(e.latlng));
+map.on('click', (e) => moveMarker(e.latlng, false));		// false makes pan work
 // move marker when dragged
-marker.on('dragend', (e) => moveMarker(e.target.getLatLng()));
+marker.on('dragend', (e) => moveMarker(e.target.getLatLng(), false));
 
-function moveMarker(latlng) {
+function moveMarker(latlng, doNotMove) {
+	// Map will pan to marker location only if clicked or dragged, otherwise map is centered on country
 	console.log(latlng)
 	marker
 		.setLatLng(latlng)
 		.bindPopup(`lat: ${latlng.lat}, <br>lng: ${latlng.lng}`).openPopup();
-	map.panTo([latlng.lat, latlng.lng])
+	if (!doNotMove) {
+		map.panTo([latlng.lat, latlng.lng])
+	}
 }
 
 
@@ -69,9 +69,9 @@ $(document).ready(function () {
 	map.once('locationfound', setCountryOfLocation); // gets code AND sets location
 	map.on('locationerror', (e) => {
 		if (e.code === 1) {
-			alert("By default map will be set to Greece/Athens\nas this is where IT all started.\n:-)");
+			alert("By default map will be set to Greece/Athens as this is where it all started.\n:-)");
 			centerMapOnSelectedCountry(countryIso2);
-			moveMarker(capitalLatLng);
+			moveMarker(capitalLatLng, true);		// true will ensure map does not pan on capital coordinates
 		}
 		else {
 			console.log(e);
@@ -152,8 +152,10 @@ $(document).ready(function () {
 		states: [{
 			title: 'Weather in capital',
 			icon: 'fa-solid fa-temperature-three-quarters',
+			// function expects e.latlng: {lat: XX, lng: XX}
+			// might be reused in other scenarios, i.e. weather at where the marker is moved, hence this argument
 			onClick: async function (btn, map) {
-				getExchangeRates();
+				getWeather({ latlng: capitalLatLng });
 				$("#genericModal").modal("show")
 			}
 		}]
@@ -257,6 +259,29 @@ $(document).ready(function () {
 				});
 
 				centerMapOnSelectedCountry(countryIso2);
+				setMarkerOnCapitalCoordinates(countryIso2);
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				console.log(jqXHR, textStatus, errorThrown)
+			}
+		});
+	}
+
+	function getWeather(e) {
+		console.log(e)
+		const { lat, lng } = e.latlng;
+		$.ajax({
+			url: "libs/php/getWeatherData.php",
+			type: 'GET',
+			async: false,		// to ensure we can update values of country codes
+			dataType: 'json',
+			data: {
+				lat: lat,
+				lng: lng
+			},
+
+			success: function (result) {
+				console.log(result.data);
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown)
@@ -274,8 +299,8 @@ $(document).ready(function () {
 
 			success: function (result) {
 				const capitalCoordinatesArr = result.data.capitalLatLng
-				const capitalCoordinatesObj = { lat: capitalCoordinatesArr[0], lng: capitalCoordinatesArr[1] }
-				moveMarker(capitalCoordinatesObj);
+				capitalLatLng = { lat: capitalCoordinatesArr[0], lng: capitalCoordinatesArr[1] }
+				moveMarker(capitalLatLng, true);		// true -> initial country map, do not pan on capital lat/lng
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown)
