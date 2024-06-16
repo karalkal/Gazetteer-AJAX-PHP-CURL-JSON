@@ -267,28 +267,6 @@ $(document).ready(function () {
 		});
 	}
 
-	function getWeather(e) {
-		console.log(e)
-		const { lat, lng } = e.latlng;
-		$.ajax({
-			url: "libs/php/getWeatherData.php",
-			type: 'GET',
-			async: false,		// to ensure we can update values of country codes
-			dataType: 'json',
-			data: {
-				lat: lat,
-				lng: lng
-			},
-
-			success: function (result) {
-				console.log(result.data);
-			},
-			error: function (jqXHR, textStatus, errorThrown) {
-				console.log(jqXHR, textStatus, errorThrown)
-			}
-		});
-	}
-
 	function setMarkerOnCapitalCoordinates(countryCodeIso2) {
 		$.ajax({
 			url: "libs/php/getCapitalLatLngByCountryIso2Code.php",
@@ -392,6 +370,28 @@ $(document).ready(function () {
 
 			success: function (result) {
 				renderCountryDataInModal(result.data, "money");
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				console.log(jqXHR, textStatus, errorThrown)
+			}
+		});
+	}
+
+	function getWeather(e) {
+		const { lat, lng } = e.latlng;
+		$.ajax({
+			url: "libs/php/getWeatherData.php",
+			type: 'GET',
+			async: false,		// to ensure we can update values of country codes
+			dataType: 'json',
+			data: {
+				lat: lat,
+				lng: lng,
+				countryCodeIso2: countryIso2,
+			},
+
+			success: function (result) {
+				console.log(result.data, "weather");
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown)
@@ -814,6 +814,49 @@ $(document).ready(function () {
 					</div>
 				</div>				
 				`)
+		}
+		//    ****    WEATHER    ****    //
+		else if (dataType === "weather") {
+			console.log(data)
+			$(".modal-body").html(`
+				<div class="divNames">
+					<h3>${data.name}</h3>
+					<h4>(${data.altSpellings[data.altSpellings.length - 1]})</h4>
+				</div>
+
+				<div class="divTwoCols">
+					<div class="divFlagAndCoA">
+						<p>Flag:</p>
+						<div id="countryFlag"><img src="https://openweathermap.org/img/wn/${data.weather.icon}@2x.png"></div>
+					</div>
+					<div class="divFlagAndCoA">
+						<p>Coat of Arms:</p>
+						<div id="countryCoatOfArms"><img src="${data.coatOfArms}"></div>
+					</div>
+				</div>
+
+				<div class="divTwoCols">
+					<div>
+						<p>Area:</p>
+						<p class="countryData"><span>${Intl.NumberFormat('de-DE').format(data.area)} km&#178;</span></p>
+					</div>
+					<div>
+						<p>Population:</p>
+						<p class="countryData"><span>${Intl.NumberFormat('de-DE').format(data.population)}</span></p>
+					</div>
+				</div>
+
+				<div class="divTwoCols">
+					<div>
+						<p>Capital:</p>
+						<p class="countryData"><span>${data.capital}</span></p>
+					</div>
+					<div>
+						<p>TLD:</p>
+						<p class="countryData"><span>${data.tld}</p>
+					</div>
+				</div>
+			`)
 		}
 
 	}
