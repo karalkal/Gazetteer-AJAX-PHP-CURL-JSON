@@ -116,6 +116,7 @@ h6 {
     font-weight: 600;
 }
 
+
 .countryData .dataYear {
     font-size: .8em;
     font-weight: 400;
@@ -178,4 +179,30 @@ h6 {
 .btnClose:hover {
     background-color: var(--orange-wheel);
     border: 2px solid var(--fire-engine-red);
+}
+
+.weatherSubHeading{
+    font-size: 1em;
+}
+
+.weatherIcon img {
+    width: 53%;
+    background-color: var(--xanthous);
+}
+
+.weatherDescription1 {
+    font-size: 1.5em;
+    font-weight: 600;
+}
+
+.weatherDescription2 {
+    font-size: 1.25em;
+    font-weight: 500;
+    font-style: oblique;
+}
+
+.weatherMeasurement{
+    font-weight: 400;
+    font-style: italic;
+    padding-left: .25em;
 }

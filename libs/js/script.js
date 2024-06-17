@@ -151,7 +151,7 @@ $(document).ready(function () {
 		leafletClasses: true,
 		states: [{
 			title: 'Weather in capital',
-			icon: 'fa-solid fa-temperature-three-quarters',
+			icon: 'fa-solid fa-cloud-sun',
 			// function expects e.latlng: {lat: XX, lng: XX}
 			// might be reused in other scenarios, i.e. weather at where the marker is moved, hence this argument
 			onClick: async function (btn, map) {
@@ -391,7 +391,8 @@ $(document).ready(function () {
 			},
 
 			success: function (result) {
-				console.log(result.data, "weather");
+				renderCountryDataInModal(result.data, "weather");
+
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown)
@@ -817,43 +818,68 @@ $(document).ready(function () {
 		}
 		//    ****    WEATHER    ****    //
 		else if (dataType === "weather") {
-			console.log(data)
+			console.log(data);
+			const { capitalName, countryName, main, sunrise, sunset, weatherArr, clouds, wind } = data;
+			// weather is array
+			const weather = weatherArr[0];
+			const sunriseTime = new Date(sunrise * 1e3).toISOString().slice(-13, -5);
+			const sunsetTime = new Date(sunset * 1e3).toISOString().slice(-13, -5);
 			$(".modal-body").html(`
 				<div class="divNames">
-					<h3>${data.name}</h3>
-					<h4>(${data.altSpellings[data.altSpellings.length - 1]})</h4>
+					<h5>Weather in ${capitalName}</h5>
+					<h5 class="weatherSubHeading">(capital of ${countryName || "Country not in DB"})</h5>
 				</div>
-
 				<div class="divTwoCols">
 					<div class="divFlagAndCoA">
-						<p>Flag:</p>
-						<div id="countryFlag"><img src="https://openweathermap.org/img/wn/${data.weather.icon}@2x.png"></div>
+						<div class="weatherIcon"><img src="https://openweathermap.org/img/wn/${weather.icon}@2x.png"></div>
 					</div>
-					<div class="divFlagAndCoA">
-						<p>Coat of Arms:</p>
-						<div id="countryCoatOfArms"><img src="${data.coatOfArms}"></div>
+					<div>
+						<p class="weatherDescription1">${weather.main}</p>
+						<p class="weatherDescription2">${weather.description}</p>
 					</div>
 				</div>
 
 				<div class="divTwoCols">
 					<div>
-						<p>Area:</p>
-						<p class="countryData"><span>${Intl.NumberFormat('de-DE').format(data.area)} km&#178;</span></p>
+						<p>Temperature:</p>
+						<p class="countryData">${main.temp}<span class="weatherMeasurement">&deg;C</span></p>
 					</div>
 					<div>
-						<p>Population:</p>
-						<p class="countryData"><span>${Intl.NumberFormat('de-DE').format(data.population)}</span></p>
+						<p>Feels Like:</p>
+						<p class="countryData">${main.feels_like}<span class="weatherMeasurement">&deg;C</span></p>
 					</div>
 				</div>
 
 				<div class="divTwoCols">
 					<div>
-						<p>Capital:</p>
-						<p class="countryData"><span>${data.capital}</span></p>
+						<p>Humidity:</p>
+						<p class="countryData">${main.feels_like}<span class="weatherMeasurement">%</span></p>
 					</div>
 					<div>
-						<p>TLD:</p>
-						<p class="countryData"><span>${data.tld}</p>
+						<p>Pressure:</p>
+						<p class="countryData">${main.pressure}<span class="weatherMeasurement">hPa</p>
+					</div>
+				</div>
+
+				<div class="divTwoCols">
+					<div>
+						<p>Wind:</p>
+						<p class="countryData">${wind}<span class="weatherMeasurement">m/s</span></p>
+					</div>
+					<div>
+						<p>Clouds</p>
+						<p class="countryData">${clouds}<span class="weatherMeasurement">%</span></p>
+					</div>
+				</div>
+
+				<div class="divTwoCols">
+					<div>
+						<p>Sunrise:</p>
+						<p class="countryData">${sunriseTime}</p>
+					</div>
+					<div>
+						<p>Sunset:</p>
+						<p class="countryData">${sunsetTime}</p>
 					</div>
 				</div>
 			`)

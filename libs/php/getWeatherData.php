@@ -42,9 +42,10 @@ $output['status']['code'] = "200";
 $output['status']['name'] = "ok";
 $output['status']['description'] = "success";
 
-$output['data']['weather'] = $decodedWeatherData['weather'];
+$output['data']['weatherArr'] = $decodedWeatherData['weather'];
 $output['data']['main'] = $decodedWeatherData['main'];
-$output['data']['wind'] = $decodedWeatherData['clouds']['all'];
+$output['data']['wind'] = $decodedWeatherData['wind']['speed'];
+$output['data']['clouds'] = $decodedWeatherData['clouds']['all'];
 $output['data']['sunrise'] = $decodedWeatherData['sys']['sunrise'];
 $output['data']['sunset'] = $decodedWeatherData['sys']['sunset'];
 
