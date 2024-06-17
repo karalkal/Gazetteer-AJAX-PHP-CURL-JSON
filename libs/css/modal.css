@@ -80,8 +80,15 @@ h6 {
 .divTwoCols>div {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
     padding: .2em .4em;
+}
+
+.divTwoCols>.divFlagAndCoA {
+    justify-content: flex-start;
+}
+
+.divTwoCols>.divWeather {
+    justify-content: center;
 }
 
 .divTwoCols>div>p {
@@ -133,32 +140,32 @@ h6 {
 }
 
 
-.divTwoColsSplit>.divExchangeRateLeft,
-.divTwoColsSplit>.divExchangeRateRight {
+.divTwoColsSplit>.divSplitColumnsLeft,
+.divTwoColsSplit>.divSplitColumnsRight {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     padding: .2em .4em;
 }
 
-.divTwoColsSplit>.divExchangeRateLeft p,
-.divTwoColsSplit>.divExchangeRateRight p {
+.divTwoColsSplit>.divSplitColumnsLeft p,
+.divTwoColsSplit>.divSplitColumnsRight p {
     margin: 0;
 }
 
-.divTwoColsSplit>.divExchangeRateLeft p:first-child,
-.divTwoColsSplit>.divExchangeRateRight p:first-child {
+.divTwoColsSplit>.divSplitColumnsLeft p:first-child,
+.divTwoColsSplit>.divSplitColumnsRight p:first-child {
     font-family: "Oswald", sans-serif;
     font-weight: 300;
     /* font-style: oblique; */
 }
 
-.divTwoColsSplit>.divExchangeRateLeft {
+.divTwoColsSplit>.divSplitColumnsLeft {
     background-color: var(--vanilla);
     margin-right: .1em;
 }
 
-.divTwoColsSplit>.divExchangeRateRight {
+.divTwoColsSplit>.divSplitColumnsRight {
     background-color: var(--vanilla);
     margin-left: .1em;
 }
@@ -181,27 +188,34 @@ h6 {
     border: 2px solid var(--fire-engine-red);
 }
 
-.weatherSubHeading{
+.weatherSubHeading1 {
     font-size: 1em;
 }
 
+.weatherSubHeading2 {
+    font-family: "Oswald", sans-serif;
+    font-size: 1em;
+    font-weight: 400;
+    text-align: left;
+}
+
 .weatherIcon img {
-    width: 53%;
+    width: 44%;
     background-color: var(--xanthous);
 }
 
 .weatherDescription1 {
-    font-size: 1.5em;
+    font-size: 1.25em;
     font-weight: 600;
 }
 
 .weatherDescription2 {
-    font-size: 1.25em;
+    font-size: 1.16em;
     font-weight: 500;
     font-style: oblique;
 }
 
-.weatherMeasurement{
+.weatherMeasurement {
     font-weight: 400;
     font-style: italic;
     padding-left: .25em;

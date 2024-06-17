@@ -48,6 +48,8 @@ $output['data']['wind'] = $decodedWeatherData['wind']['speed'];
 $output['data']['clouds'] = $decodedWeatherData['clouds']['all'];
 $output['data']['sunrise'] = $decodedWeatherData['sys']['sunrise'];
 $output['data']['sunset'] = $decodedWeatherData['sys']['sunset'];
+$output['data']['epochDateTime'] = $decodedWeatherData['dt'];
+$output['data']['timezone'] = $decodedWeatherData['timezone'];
 
 $output['status']['returnedIn'] = intval((microtime(true) - $executionStartTime) * 1000) . " ms";
 

@@ -735,81 +735,81 @@ $(document).ready(function () {
 					<h6>${data.exchangeRates.time_last_update_utc}</h6>
 				</div>
 				<div class="divTwoColsSplit">
-					<div class="divExchangeRateLeft">
+					<div class="divSplitColumnsLeft">
 						<p>Euro (€):</p>
 						<p class="countryData"><span>${data.exchangeRates.conversion_rates.EUR}</span></p>
 					</div>
-					<div class="divExchangeRateRight">
+					<div class="divSplitColumnsRight">
 						<p>US Dollar (US$): </p>
 						<p class="countryData"><span>${data.exchangeRates.conversion_rates.USD}</span></p>
 					</div>
 				</div>
 				<div class="divTwoColsSplit">
-					<div class="divExchangeRateLeft">
+					<div class="divSplitColumnsLeft">
 						<p>Japanese yen (¥ / 円):</p>
 						<p class="countryData"><span>${data.exchangeRates.conversion_rates.JPY}</span></p>
 					</div>
-					<div class="divExchangeRateRight">
+					<div class="divSplitColumnsRight">
 						<p>British pound (£):</p>
 						<p class="countryData"><span>${data.exchangeRates.conversion_rates.GBP}</span></p>
 					</div>
 				</div>
 				<div class="divTwoColsSplit">
-					<div class="divExchangeRateLeft">
+					<div class="divSplitColumnsLeft">
 						<p>Swiss franc (CHF):</p>
 						<p class="countryData"><span>${data.exchangeRates.conversion_rates.CHF}</span></p>
 					</div>
-					<div class="divExchangeRateRight">					
+					<div class="divSplitColumnsRight">					
 						<p>Renminbi (¥ / 元):</p>
 						<p class="countryData"><span>${data.exchangeRates.conversion_rates.CNY}</span></p>
 					</div>
 				</div>
 				<div class="divTwoColsSplit">
-					<div class="divExchangeRateLeft">
+					<div class="divSplitColumnsLeft">
 						<p>Australian dollar (A$):</p>
 						<p class="countryData"><span>${data.exchangeRates.conversion_rates.AUD}</span></p>
 					</div>					
-					<div class="divExchangeRateRight">
+					<div class="divSplitColumnsRight">
 						<p>Canadian dollar (C$):</p>
 						<p class="countryData"><span>${data.exchangeRates.conversion_rates.CAD}</span></p>
 					</div>
 				</div>
 				<div class="divTwoColsSplit">
-					<div class="divExchangeRateLeft">
+					<div class="divSplitColumnsLeft">
 						<p>Swedish krona (kr):</p>
 						<p class="countryData"><span>${data.exchangeRates.conversion_rates.SEK}</span></p>
 					</div>
-					<div class="divExchangeRateRight">
+					<div class="divSplitColumnsRight">
 						<p>Norwegian krona (kr):</p>
 						<p class="countryData"><span>${data.exchangeRates.conversion_rates.NOK}</span></p>
 					</div>
 				</div>
 				<div class="divTwoColsSplit">
-					<div class="divExchangeRateLeft">
+					<div class="divSplitColumnsLeft">
 						<p>Danish krona (kr):</p>
 						<p class="countryData"><span>${data.exchangeRates.conversion_rates.DKK}</span></p>
 					</div>
-					<div class="divExchangeRateRight">
+					<div class="divSplitColumnsRight">
 						<p>Polish złoty (zł):</p>
 						<p class="countryData"><span>${data.exchangeRates.conversion_rates.PLN}</span></p>
 					</div>
 				</div>
 				<div class="divTwoColsSplit">
-					<div class="divExchangeRateLeft">
+					<div class="divSplitColumnsLeft">
 						<p>Czech koruna (Kč):</p>
 						<p class="countryData"><span>${data.exchangeRates.conversion_rates.CZK}</span></p>
 					</div>					
-					<div class="divExchangeRateRight">
+					<div class="divSplitColumnsRight">
 						<p>Romanian leu (L):</p>
 						<p class="countryData"><span>${data.exchangeRates.conversion_rates.RON}</span></p>
 					</div>
 				</div>
 				<div class="divTwoColsSplit">
-					<div class="divExchangeRateLeft">
+					<div class="divSplitColumnsLeft">
 						<p>Hungarian forint (Ft):</p>
 						<p class="countryData"><span>${data.exchangeRates.conversion_rates.HUF}</span></p>
 					</div>					
-					<div class="divExchangeRateRight">
+					<div class="divSplitColumnsRight">
 						<p>Bulgarian lev (лв):</p>
 						<p class="countryData"><span>${data.exchangeRates.conversion_rates.BGN}</span></p>
 					</div>
@@ -818,19 +818,22 @@ $(document).ready(function () {
 		}
 		//    ****    WEATHER    ****    //
 		else if (dataType === "weather") {
-			console.log(data);
-			const { capitalName, countryName, main, sunrise, sunset, weatherArr, clouds, wind } = data;
+			// console.log(data);
+			const { capitalName, countryName, main, sunrise, sunset,
+				weatherArr, clouds, wind, epochDateTime, timezone } = data;
 			// weather is array
 			const weather = weatherArr[0];
-			const sunriseTime = new Date(sunrise * 1e3).toISOString().slice(-13, -5);
-			const sunsetTime = new Date(sunset * 1e3).toISOString().slice(-13, -5);
+			// const sunriseTime = new Date(sunrise * 1e3).toISOString().slice(-13, -5);
+			// const sunsetTime = new Date(sunset * 1e3).toISOString().slice(-13, -5);
+
 			$(".modal-body").html(`
 				<div class="divNames">
-					<h5>Weather in ${capitalName}</h5>
-					<h5 class="weatherSubHeading">(capital of ${countryName || "Country not in DB"})</h5>
+					<h5>Current weather in ${capitalName}</h5>
+					<h5 class="weatherSubHeading1">(capital of ${countryName || "Country not in DB"})</h5>
+					<h5 class="weatherSubHeading1">at ${epochDateTime} (Unix time)</h5>
 				</div>
 				<div class="divTwoCols">
-					<div class="divFlagAndCoA">
+					<div class="divWeather">
 						<div class="weatherIcon"><img src="https://openweathermap.org/img/wn/${weather.icon}@2x.png"></div>
 					</div>
 					<div>
@@ -839,47 +842,48 @@ $(document).ready(function () {
 					</div>
 				</div>
 
-				<div class="divTwoCols">
-					<div>
+
+				<div class="divTwoColsSplit">
+					<div class="divSplitColumnsLeft">
 						<p>Temperature:</p>
 						<p class="countryData">${main.temp}<span class="weatherMeasurement">&deg;C</span></p>
 					</div>
-					<div>
+					<div class="divSplitColumnsRight">
 						<p>Feels Like:</p>
 						<p class="countryData">${main.feels_like}<span class="weatherMeasurement">&deg;C</span></p>
 					</div>
 				</div>
 
-				<div class="divTwoCols">
-					<div>
+				<div class="divTwoColsSplit">
+					<div class="divSplitColumnsLeft">
 						<p>Humidity:</p>
 						<p class="countryData">${main.feels_like}<span class="weatherMeasurement">%</span></p>
 					</div>
-					<div>
+					<div class="divSplitColumnsRight">
 						<p>Pressure:</p>
 						<p class="countryData">${main.pressure}<span class="weatherMeasurement">hPa</p>
 					</div>
 				</div>
 
-				<div class="divTwoCols">
-					<div>
+				<div class="divTwoColsSplit">
+					<div class="divSplitColumnsLeft">
 						<p>Wind:</p>
 						<p class="countryData">${wind}<span class="weatherMeasurement">m/s</span></p>
 					</div>
-					<div>
+					<div class="divSplitColumnsRight">
 						<p>Clouds</p>
 						<p class="countryData">${clouds}<span class="weatherMeasurement">%</span></p>
 					</div>
 				</div>
 
-				<div class="divTwoCols">
-					<div>
-						<p>Sunrise:</p>
-						<p class="countryData">${sunriseTime}</p>
+				<div class="divTwoColsSplit">
+					<div class="divSplitColumnsLeft">
+						<p>Sunrise (Unix time):</p>
+						<p class="countryData">${sunrise}</p>
 					</div>
-					<div>
-						<p>Sunset:</p>
-						<p class="countryData">${sunsetTime}</p>
+					<div class="divSplitColumnsRight">
+						<p>Sunset (Unix time):</p>
+						<p class="countryData">${sunset}</p>
 					</div>
 				</div>
 			`)

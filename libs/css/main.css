@@ -67,6 +67,17 @@ body {
     margin-left: 1%;
 }
 
+.leaflet-right.leaflet-top {
+    margin-top: 6em;
+    margin-right: 1%;
+}
+
+.leaflet-touch .leaflet-control-layers-toggle {
+    background-color: var(--xanthous);
+    width: 5.3em;
+    height: 5.3em;
+}
+
 .leaflet-touch .leaflet-bar a {
     /* center icons */
     display: flex;
