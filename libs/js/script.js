@@ -857,7 +857,7 @@ $(document).ready(function () {
 				<div class="divTwoColsSplit">
 					<div class="divSplitColumnsLeft">
 						<p>Humidity:</p>
-						<p class="countryData">${main.feels_like}<span class="weatherMeasurement">%</span></p>
+						<p class="countryData">${main.humidity}<span class="weatherMeasurement">%</span></p>
 					</div>
 					<div class="divSplitColumnsRight">
 						<p>Pressure:</p>
