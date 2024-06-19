@@ -129,3 +129,11 @@ body {
     padding: .2em 0;
     font-size: 2.6em;
 }
+
+/* Tablet Landscape and smaller*/
+@media only screen and (max-width: 992px) {
+    .leaflet-touch .leaflet-control-layers-toggle {
+        width: 4.4em;
+        height: 4.4em;
+    }
+}
