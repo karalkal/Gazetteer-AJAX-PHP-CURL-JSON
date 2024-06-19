@@ -36,9 +36,9 @@ body {
 #selectContainer {
     position: fixed;
     top: 0;
-    left: 28%;
+    left: 1%;
     z-index: 1000;
-    width: 44%;
+    width: 98%;
     padding: 11px 0;
     text-align: center;
 }
@@ -129,12 +129,3 @@ body {
     padding: .2em 0;
     font-size: 2.6em;
 }
-
-
-/* Tablet Landscape and smaller*/
-@media only screen and (max-width: 992px) {
-    .leaflet-touch .leaflet-control-layers-toggle {
-        width: 4.4em;
-        height: 4.4em;
-    }  
-  }
