@@ -730,6 +730,40 @@ $(document).ready(function () {
 					<h5>${data.countryName || "Country not in DB"} - Money</h5>
 					<h4>${currencyArr[0].name} (${currencyArr[0].symbol})</h4>
 				</div>
+
+
+				<form class="mb-2 exchangeForm">
+						<div class="row mb-3">
+							<div class="col-5 pr-1">
+								<input type="text" class="form-control originalAmount" placeholder="convert">
+							</div>
+							<div class="col-7 pl-1 align-self-end">
+								<input readonly class="form-control text-truncate originalCurrency"
+									value="XXXXXXX XXXXXXXXXX-xxxx xxxxxxxx"></input>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-7 pr-1">
+								<select class="form-control currencySelect">
+									<option selected disabled hidden>to:</option>
+									<option>currency_2</option>
+									<option>currency_3</option>
+									<option>currency_4</option>
+									<option>currency_5</option>
+								</select>
+							</div>
+							<div class="col-5 pl-1">
+								<p class="form-control resultAmount">result</p>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-12">
+								<button type="submit" class="btn float-right btnSubmit">Convert</button>
+							</div>
+						</div>
+					</form>
+
+
 				<div class="divOneCol">
 					<h6>exchange rates as of UTC time</h6>
 					<h6>${data.exchangeRates.time_last_update_utc}</h6>
