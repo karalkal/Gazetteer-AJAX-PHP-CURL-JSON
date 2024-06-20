@@ -16,16 +16,16 @@
 	<link rel="icon" type="image/png" sizes="16x16" href="libs/favicon/favicon-16x16.png">
 	<link rel="manifest" href="/site.webmanifest">
 	<!-- Font-awesome -->
-	<script src="https://kit.fontawesome.com/8faed9ab15.js" crossorigin="anonymous"></script>
-	<!-- jQuery-->
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
-		integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
-	<!-- LEAFLET css + script -->
-	<!-- Main -->
-	<link rel="stylesheet" href="./libs/leaflet/main/leaflet.css" />
+	<link rel="stylesheet" href="libs/fontawesome/css/fontawesome.css" />
+	<link rel="stylesheet" href="libs/fontawesome/css/solid.css" />
+	<!--Bootstrap-->
+	<link rel="stylesheet" href="libs/css/bootstrap.min.css">
+	<!--LEAFLET css + script-->
+	<!--		Main -->
+	<link rel="stylesheet" href="libs/leaflet/main/leaflet.css" />
 	<script src="libs/leaflet/main/leaflet.js"></script>
-	<!-- Button -->
-	<link rel="stylesheet" href="./libs/leaflet/easy-button/easy-button.css">
+	<!-- 		Button -->
+	<link rel="stylesheet" href="libs/leaflet/easy-button/easy-button.css">
 	<script src="libs/leaflet/easy-button/easy-button.js"></script>
 	<!-- Custom CSS -->
 	<link rel="stylesheet" href="libs/css/main.css">
@@ -36,7 +36,8 @@
 <body>
 	<span id="selectContainer">
 		<select id="countrySelect" class="form-select shadow-sm">
-			<option selected disabled hidden>Countries List:</option> <!-- populate from an AJAX CALL to a PHP routine that returns a JSON object 
+			<option selected disabled hidden>Countries List:</option>
+			<!-- populate from an AJAX CALL to a PHP routine that returns a JSON object 
 				that is an array of just ISO codes and names from countryBorders.geo.json 
 				e.g.	<option value="AF">Afghanistan</option> -->
 		</select>

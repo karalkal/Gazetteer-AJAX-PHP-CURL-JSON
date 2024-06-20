@@ -1,0 +1,154 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+
+	<title>currency convertor</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<!-- Favicon -->
+	<link rel="apple-touch-icon" sizes="180x180" href="libs/favicon/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="libs/favicon/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="libs/favicon/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<!-- Font-awesome -->
+	<link rel="stylesheet" href="libs/fontawesome/css/fontawesome.css" />
+	<link rel="stylesheet" href="libs/fontawesome/css/solid.css" />
+	<!--Bootstrap-->
+	<link rel="stylesheet" href="libs/css/bootstrap.min.css">
+	<!-- Custom CSS -->
+	<link rel="stylesheet" href="libs/css/main.css">
+	<link rel="stylesheet" href="libs/css/modal.css">
+	<link rel="stylesheet" href="libs/css/preloader.css">
+</head>
+
+<body>
+	<span id="selectContainer">
+		<select id="countrySelect" class="form-select shadow-sm">
+			<option selected disabled hidden>Countries List:</option>
+			<!-- populate from an AJAX CALL to a PHP routine that returns a JSON object 
+				that is an array of just ISO codes and names from countryBorders.geo.json 
+				e.g.	<option value="AF">Afghanistan</option> -->
+		</select>
+	</span>
+
+	<div id="map"></div>
+
+	<div id="genericModal" class="modal" data-bs-backdrop="false" tabindex="-1" style="display: block">
+		<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content">
+				<div class="modal-body">
+					<!-- render modal content here -->
+					 <form></form>
+
+
+					<div class="divNames">
+						<h5>${data.countryName || "Country not in DB"} - Money</h5>
+						<h4>${currencyArr[0].name} (${currencyArr[0].symbol})</h4>
+					</div>
+					<div class="divOneCol">
+						<h6>exchange rates as of UTC time</h6>
+						<h6>${data.exchangeRates.time_last_update_utc}</h6>
+					</div>
+					<div class="divTwoColsSplit">
+						<div class="divSplitColumnsLeft">
+							<p>Euro (€):</p>
+							<p class="countryData"><span>XOXOXOXO EUR}</span></p>
+						</div>
+						<div class="divSplitColumnsRight">
+							<p>US Dollar (US$): </p>
+							<p class="countryData"><span>XOXOXOXO USD}</span></p>
+						</div>
+					</div>
+					<div class="divTwoColsSplit">
+						<div class="divSplitColumnsLeft">
+							<p>Japanese yen (¥ / 円):</p>
+							<p class="countryData"><span>XOXOXOXO JPY}</span></p>
+						</div>
+						<div class="divSplitColumnsRight">
+							<p>British pound (£):</p>
+							<p class="countryData"><span>XOXOXOXO GBP}</span></p>
+						</div>
+					</div>
+					<div class="divTwoColsSplit">
+						<div class="divSplitColumnsLeft">
+							<p>Swiss franc (CHF):</p>
+							<p class="countryData"><span>XOXOXOXO CHF}</span></p>
+						</div>
+						<div class="divSplitColumnsRight">
+							<p>Renminbi (¥ / 元):</p>
+							<p class="countryData"><span>XOXOXOXO CNY}</span></p>
+						</div>
+					</div>
+					<div class="divTwoColsSplit">
+						<div class="divSplitColumnsLeft">
+							<p>Australian dollar (A$):</p>
+							<p class="countryData"><span>XOXOXOXO AUD}</span></p>
+						</div>
+						<div class="divSplitColumnsRight">
+							<p>Canadian dollar (C$):</p>
+							<p class="countryData"><span>XOXOXOXO CAD}</span></p>
+						</div>
+					</div>
+					<div class="divTwoColsSplit">
+						<div class="divSplitColumnsLeft">
+							<p>Swedish krona (kr):</p>
+							<p class="countryData"><span>XOXOXOXO SEK}</span></p>
+						</div>
+						<div class="divSplitColumnsRight">
+							<p>Norwegian krona (kr):</p>
+							<p class="countryData"><span>XOXOXOXO NOK}</span></p>
+						</div>
+					</div>
+					<div class="divTwoColsSplit">
+						<div class="divSplitColumnsLeft">
+							<p>Danish krona (kr):</p>
+							<p class="countryData"><span>XOXOXOXO DKK}</span></p>
+						</div>
+						<div class="divSplitColumnsRight">
+							<p>Polish złoty (zł):</p>
+							<p class="countryData"><span>XOXOXOXO PLN}</span></p>
+						</div>
+					</div>
+					<div class="divTwoColsSplit">
+						<div class="divSplitColumnsLeft">
+							<p>Czech koruna (Kč):</p>
+							<p class="countryData"><span>XOXOXOXO CZK}</span></p>
+						</div>
+						<div class="divSplitColumnsRight">
+							<p>Romanian leu (L):</p>
+							<p class="countryData"><span>XOXOXOXO RON}</span></p>
+						</div>
+					</div>
+					<div class="divTwoColsSplit">
+						<div class="divSplitColumnsLeft">
+							<p>Hungarian forint (Ft):</p>
+							<p class="countryData"><span>XOXOXOXO HUF}</span></p>
+						</div>
+						<div class="divSplitColumnsRight">
+							<p>Bulgarian lev (лв):</p>
+							<p class="countryData"><span>XOXOXOXO BGN}</span></p>
+						</div>
+					</div>
+
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btnClose">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id=”preloader”></div>
+
+	<!-- SCRIPTS -->
+	<!-- Bootstrap --  suggested location by BS-->
+	<script src="libs//js/bootstrap.bundle.min.js"></script>
+	<!-- My script -->
+
+</body>
+
+</html>
