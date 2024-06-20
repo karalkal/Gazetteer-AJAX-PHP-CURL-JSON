@@ -195,6 +195,31 @@ $(document).ready(function () {
 		});
 	}
 
+	function loadCurrenciesInSelectContainer() {
+		$.ajax({
+			url: "libs/php/getAllCurrencies.php",
+			type: 'GET',
+			dataType: 'json',
+
+			success: function (result) {
+				console.log(result)
+				// $.each(result.data.allCountriesArr, function (index, value) {
+				// 	$('#countrySelect')
+				// 		.append($("<option></option>")
+				// 			.attr("value", `${value.iso_a2}|${value.iso_a3}`)
+				// 			.text(value.name));
+				// });
+
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				console.log(jqXHR, textStatus, errorThrown);
+				alert("Something went wrong")
+			}
+		});
+
+
+	}
+
 	function centerMapOnSelectedCountry(countryCodeIso2) {		// get country boundaries, remove prev. polygon and center map
 		$.ajax({
 			url: "libs/php/getCountryBoundaries.php",
@@ -739,12 +764,16 @@ $(document).ready(function () {
 							</div>
 							<div class="col-7 pl-1 align-self-end">
 								<input readonly class="form-control text-truncate originalCurrency"
-									value="XXXXXXX XXXXXXXXXX-xxxx xxxxxxxx"></input>
+									value="${currencyArr[0].name} (${currencyArr[0].symbol})"></input>
 							</div>
 						</div>
 						<div class="row">
 							<div class="col-7 pr-1">
 								<select class="form-control currencySelect">
+
+
+									${loadCurrenciesInSelectContainer(data.exchangeRates.conversion_rates)}
+								
 									<option selected disabled hidden>to:</option>
 									<option>currency_2</option>
 									<option>currency_3</option>

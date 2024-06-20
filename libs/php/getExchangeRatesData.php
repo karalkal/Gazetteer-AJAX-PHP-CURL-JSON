@@ -43,10 +43,7 @@ if (false !== $response_json) {
 
         // Check for success
         if ('success' === $response->result) {
-            // print_r($response);
-            // YOUR APPLICATION CODE HERE, e.g.
-            $base_price = 12; // Your price in USD
-            $EUR_price = round(($base_price * $response->conversion_rates->EUR), 2);
+            // YOUR APPLICATION CODE HERE, e.g.            
             // Attaching response data to output obj
             $output['data']['exchangeRates'] = $response;
         }
