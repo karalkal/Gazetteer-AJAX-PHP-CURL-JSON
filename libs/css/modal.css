@@ -22,7 +22,6 @@
     vertical-align: baseline;
 }
 
-
 .modal-content {
     background-color: var(--xanthous);
 }
@@ -233,6 +232,20 @@ h6 {
 .currencySelect {
     background-color: var(--vanilla);
     border: none;
+}
+
+.originalAmount:focus,
+.resultAmount:focus,
+.currencySelect:focus {
+    background-color: var(--xanthous);
+    border: none;
+    box-shadow: none;
+}
+
+.originalCurrency[readonly]:focus {
+    background-color: var(--vanilla);
+    border: none;
+    box-shadow: none;
 }
 
 .btnSubmit {
