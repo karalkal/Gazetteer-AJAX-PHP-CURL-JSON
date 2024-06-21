@@ -194,14 +194,81 @@ $(document).ready(function () {
 		});
 	}
 
-	function renderCurrencyConversionForm(currencyArr, allCurrenciesData) {
-		console.log("here")
-		return
+	function renderCurrencyConversionForm1(currencyArr, allCurrenciesData) {
+		// Restricts input for each element in the set of matched elements to the given inputFilter.
+		(function ($) {
+			$.fn.inputFilter = function (callback, errMsg) {
+				return this.on("input keydown keyup mousedown mouseup select contextmenu drop focusout", function (e) {
+					if (callback(this.value)) {
+						// Accepted value
+						if (["keydown", "mousedown", "focusout"].indexOf(e.type) >= 0) {
+							$(this).removeClass("input-error");
+							this.setCustomValidity("");
+						}
+						this.oldValue = this.value;
+						this.oldSelectionStart = this.selectionStart;
+						this.oldSelectionEnd = this.selectionEnd;
+					} else if (this.hasOwnProperty("oldValue")) {
+						// Rejected value - restore the previous one
+						$(this).addClass("input-error");
+						this.setCustomValidity(errMsg);
+						this.reportValidity();
+						this.value = this.oldValue;
+						this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+					} else {
+						// Rejected value - nothing to restore
+						this.value = "";
+					}
+				});
+			};
+		}(jQuery));
+
+		$(".modal-body").append(`
+			<form class="mb-2" id="exchangeForm1">
+				<div class="row mb-3">
+					<div class="col-5 pr-1">
+						<input type="text" class="form-control" 
+						id="originalAmount" placeholder="convert">
+					</div>
+					<div class="col-7 pl-1 align-self-end">
+						<input readonly class="form-control text-truncate" id="originalCurrency"
+							value="${currencyArr[0].name} (${currencyArr[0].symbol})"></input>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-7 pr-1">
+						<select class="form-control" id="currencySelect">	
+						${populateCurrencySelectContainer(allCurrenciesData.supported_codes)}
+						</select>
+					</div>
+					<div class="col-5 pl-1">
+						<p class="form-control" id="resultAmount">result</p>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-12">
+						<button type="submit" class="btn float-right btnSubmit">Convert</button>
+					</div>
+				</div>
+			</form>`);
+
+		// can use dot or comma
+		console.log($("#originalAmount").val())
+		$("#originalAmount").inputFilter(function (value) {
+			return /^-?\d*[.,]?\d*$/.test(value);
+		}, "Must be a floating (real) number");
+
+		$("#exchangeForm1").on("submit", function (event) {
+			event.preventDefault();
+			console.log(event.formData)
+			alert("Handler for `submit` called.");
+		});
+
 	}
 
 	function convertCurrency(e) {
 		e.preventDefault();
-		let formData = new FormData(document.getElementById('exchangeForm'));
+		let formData = new FormData(document.getElementById('exchangeForm1'));
 		console.log(formData.entries());
 	}
 
@@ -757,49 +824,18 @@ $(document).ready(function () {
 		}
 		//    ****    MONEY EXCHANGE    ****    //
 		else if (dataType === "money") {
-			var update = function () {
-				console.log(JSON.stringify($('form').serializeArray()));
-			};
-
 			const { allCurrenciesData, exchangeRatesData } = data
 			const currencyArr = Object.values(exchangeRatesData.primaryCurrency);
-			console.log(allCurrenciesData.supported_codes);
-			// const conversionForm = renderCurrencyConversionForm(currencyArr, allCurrenciesData);
-			// console.log(conversionForm);
 
-			$(".modal-body")
-				.html(`
+			$(".modal-body").html(`
 				<div class="divNames">
 					<h5>${exchangeRatesData.countryName || "Country not in DB"} - Money</h5>
 					<h4>${currencyArr[0].name} (${currencyArr[0].symbol})</h4>
-				</div>
-				
-				<form class="mb-2" id="exchangeForm">
-					<div class="row mb-3">
-						<div class="col-5 pr-1">
-							<input type="text" class="form-control originalAmount" placeholder="convert">
-						</div>
-						<div class="col-7 pl-1 align-self-end">
-							<input readonly class="form-control text-truncate originalCurrency"
-								value="${currencyArr[0].name} (${currencyArr[0].symbol})"></input>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-7 pr-1">
-							<select class="form-control currencySelect">	
-							${populateCurrencySelectContainer(allCurrenciesData.supported_codes)}
-							</select>
-						</div>
-						<div class="col-5 pl-1">
-							<p class="form-control resultAmount">result</p>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-12">
-							<button type="submit" class="btn float-right btnSubmit">Convert</button>
-						</div>
-					</div>
-				</form>
+				</div>`);
+
+			renderCurrencyConversionForm1(currencyArr, allCurrenciesData);
+
+			$(".modal-body").append(`
 				<div class="divOneCol">
 					<h6>exchange rates as of UTC time</h6>
 					<h6>${exchangeRatesData.exchangeRates.time_last_update_utc}</h6>

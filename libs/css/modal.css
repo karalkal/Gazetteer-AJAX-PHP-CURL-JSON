@@ -220,29 +220,29 @@ h6 {
     padding-left: .25em;
 }
 
-#exchangeForm {
+#exchangeForm1 {
     background-color: var(--orange-wheel);
     border: 1px solid var(--fire-engine-red);
     padding: 1%;
 }
 
-.originalAmount,
-.originalCurrency[readonly],
-.resultAmount,
-.currencySelect {
+#originalAmount,
+#originalCurrency[readonly],
+#resultAmount,
+#currencySelect {
     background-color: var(--vanilla);
     border: none;
 }
 
-.originalAmount:focus,
-.resultAmount:focus,
-.currencySelect:focus {
+#originalAmount:focus,
+#resultAmount:focus,
+#currencySelect:focus {
     background-color: var(--xanthous);
     border: none;
     box-shadow: none;
 }
 
-.originalCurrency[readonly]:focus {
+#originalCurrency[readonly]:focus {
     background-color: var(--vanilla);
     border: none;
     box-shadow: none;
