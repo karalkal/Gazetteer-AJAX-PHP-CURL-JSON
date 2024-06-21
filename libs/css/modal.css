@@ -220,7 +220,7 @@ h6 {
     padding-left: .25em;
 }
 
-.exchangeForm {
+#exchangeForm {
     background-color: var(--orange-wheel);
     border: 1px solid var(--fire-engine-red);
     padding: 1%;

@@ -45,7 +45,7 @@ marker.on('dragend', (e) => moveMarker(e.target.getLatLng(), false));
 
 function moveMarker(latlng, doNotMove) {
 	// Map will pan to marker location only if clicked or dragged, otherwise map is centered on country
-	console.log(latlng)
+	// console.log(latlng)
 	marker
 		.setLatLng(latlng)
 		.bindPopup(`lat: ${latlng.lat}, <br>lng: ${latlng.lng}`).openPopup();
@@ -59,7 +59,7 @@ $(document).ready(function () {
 	let [countryIso2, countryIso3] = ["GR", "GRC"]				// default country set to Greece, these values are changed as required
 	let capitalLatLng = { lat: 37.983810, lng: 23.727539 }		// will place marker on capital, default Athens
 
-	loadCountriesNamesAndCodes();			// Load Counties as <select> options
+	renderCountriesNamesAndCodes();			// Load Counties as <select> options
 
 	/**	Set initial location:
 		if user opts in => get latlng from event, send request to get countryCode and display map
@@ -173,7 +173,7 @@ $(document).ready(function () {
 	});
 
 
-	function loadCountriesNamesAndCodes() {
+	function renderCountriesNamesAndCodes() {
 		$.ajax({
 			url: "libs/php/getAllCountriesCodes.php",
 			type: 'GET',
@@ -186,7 +186,6 @@ $(document).ready(function () {
 							.attr("value", `${value.iso_a2}|${value.iso_a3}`)
 							.text(value.name));
 				});
-
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown);
@@ -195,29 +194,23 @@ $(document).ready(function () {
 		});
 	}
 
-	function loadCurrenciesInSelectContainer() {
-		$.ajax({
-			url: "libs/php/getAllCurrencies.php",
-			type: 'GET',
-			dataType: 'json',
+	function renderCurrencyConversionForm(currencyArr, allCurrenciesData) {
+		console.log("here")
+		return
+	}
 
-			success: function (result) {
-				console.log(result)
-				// $.each(result.data.allCountriesArr, function (index, value) {
-				// 	$('#countrySelect')
-				// 		.append($("<option></option>")
-				// 			.attr("value", `${value.iso_a2}|${value.iso_a3}`)
-				// 			.text(value.name));
-				// });
+	function convertCurrency(e) {
+		e.preventDefault();
+		let formData = new FormData(document.getElementById('exchangeForm'));
+		console.log(formData.entries());
+	}
 
-			},
-			error: function (jqXHR, textStatus, errorThrown) {
-				console.log(jqXHR, textStatus, errorThrown);
-				alert("Something went wrong")
-			}
+	function populateCurrencySelectContainer(allCurrenciesArr) {
+		let options = "<option selected disabled hidden>to:</option>";
+		allCurrenciesArr.forEach(curr => {
+			options += `<option value="${curr[0]}">${curr[1]}</option>\n`
 		});
-
-
+		return options;
 	}
 
 	function centerMapOnSelectedCountry(countryCodeIso2) {		// get country boundaries, remove prev. polygon and center map
@@ -385,19 +378,38 @@ $(document).ready(function () {
 	}
 
 	function getExchangeRates() {
+		// 1. get all currencies 
+		// 2. get exchange rates for selected country's currency
+		// 3. send data to rendering function
 		$.ajax({
-			url: "libs/php/getExchangeRatesData.php",
+			url: "libs/php/getAllCurrencies.php",
 			type: 'GET',
 			dataType: 'json',
-			data: ({
-				countryCodeIso2: countryIso2,
-			}),
 
-			success: function (result) {
-				renderCountryDataInModal(result.data, "money");
+			success: function (allCurrenciesResult) {
+				$.ajax({
+					url: "libs/php/getExchangeRatesData.php",
+					type: 'GET',
+					dataType: 'json',
+					data: ({
+						countryCodeIso2: countryIso2,
+					}),
+					success: function (ratesResult) {
+						let combinedData = {
+							allCurrenciesData: allCurrenciesResult.data,
+							exchangeRatesData: ratesResult.data
+						}
+						renderCountryDataInModal(combinedData, "money");
+					},
+					error: function (jqXHR, textStatus, errorThrown) {
+						console.log(jqXHR, textStatus, errorThrown)
+					},
+				});
 			},
+
 			error: function (jqXHR, textStatus, errorThrown) {
-				console.log(jqXHR, textStatus, errorThrown)
+				console.log(jqXHR, textStatus, errorThrown);
+				alert("Something went wrong")
 			}
 		});
 	}
@@ -745,136 +757,131 @@ $(document).ready(function () {
 		}
 		//    ****    MONEY EXCHANGE    ****    //
 		else if (dataType === "money") {
-			// console.log(data);
-			// console.log(Object.keys(currencyData.primaryCurrency));
-			// console.log(Object.values(currencyData.primaryCurrency));
-			const currencyArr = Object.values(data.primaryCurrency);
+			var update = function () {
+				console.log(JSON.stringify($('form').serializeArray()));
+			};
 
-			$(".modal-body").html(`
+			const { allCurrenciesData, exchangeRatesData } = data
+			const currencyArr = Object.values(exchangeRatesData.primaryCurrency);
+			console.log(allCurrenciesData.supported_codes);
+			// const conversionForm = renderCurrencyConversionForm(currencyArr, allCurrenciesData);
+			// console.log(conversionForm);
+
+			$(".modal-body")
+				.html(`
 				<div class="divNames">
-					<h5>${data.countryName || "Country not in DB"} - Money</h5>
+					<h5>${exchangeRatesData.countryName || "Country not in DB"} - Money</h5>
 					<h4>${currencyArr[0].name} (${currencyArr[0].symbol})</h4>
 				</div>
-
-
-				<form class="mb-2 exchangeForm">
-						<div class="row mb-3">
-							<div class="col-5 pr-1">
-								<input type="text" class="form-control originalAmount" placeholder="convert">
-							</div>
-							<div class="col-7 pl-1 align-self-end">
-								<input readonly class="form-control text-truncate originalCurrency"
-									value="${currencyArr[0].name} (${currencyArr[0].symbol})"></input>
-							</div>
+				
+				<form class="mb-2" id="exchangeForm">
+					<div class="row mb-3">
+						<div class="col-5 pr-1">
+							<input type="text" class="form-control originalAmount" placeholder="convert">
 						</div>
-						<div class="row">
-							<div class="col-7 pr-1">
-								<select class="form-control currencySelect">
-
-
-									${loadCurrenciesInSelectContainer(data.exchangeRates.conversion_rates)}
-								
-									<option selected disabled hidden>to:</option>
-									<option>currency_2</option>
-									<option>currency_3</option>
-									<option>currency_4</option>
-									<option>currency_5</option>
-								</select>
-							</div>
-							<div class="col-5 pl-1">
-								<p class="form-control resultAmount">result</p>
-							</div>
+						<div class="col-7 pl-1 align-self-end">
+							<input readonly class="form-control text-truncate originalCurrency"
+								value="${currencyArr[0].name} (${currencyArr[0].symbol})"></input>
 						</div>
-						<div class="row">
-							<div class="col-12">
-								<button type="submit" class="btn float-right btnSubmit">Convert</button>
-							</div>
+					</div>
+					<div class="row">
+						<div class="col-7 pr-1">
+							<select class="form-control currencySelect">	
+							${populateCurrencySelectContainer(allCurrenciesData.supported_codes)}
+							</select>
 						</div>
-					</form>
-
-
+						<div class="col-5 pl-1">
+							<p class="form-control resultAmount">result</p>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-12">
+							<button type="submit" class="btn float-right btnSubmit">Convert</button>
+						</div>
+					</div>
+				</form>
 				<div class="divOneCol">
 					<h6>exchange rates as of UTC time</h6>
-					<h6>${data.exchangeRates.time_last_update_utc}</h6>
+					<h6>${exchangeRatesData.exchangeRates.time_last_update_utc}</h6>
 				</div>
 				<div class="divTwoColsSplit">
 					<div class="divSplitColumnsLeft">
 						<p>Euro (€):</p>
-						<p class="countryData"><span>${data.exchangeRates.conversion_rates.EUR}</span></p>
+						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.EUR}</span></p>
 					</div>
 					<div class="divSplitColumnsRight">
 						<p>US Dollar (US$): </p>
-						<p class="countryData"><span>${data.exchangeRates.conversion_rates.USD}</span></p>
+						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.USD}</span></p>
 					</div>
 				</div>
 				<div class="divTwoColsSplit">
 					<div class="divSplitColumnsLeft">
 						<p>Japanese yen (¥ / 円):</p>
-						<p class="countryData"><span>${data.exchangeRates.conversion_rates.JPY}</span></p>
+						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.JPY}</span></p>
 					</div>
 					<div class="divSplitColumnsRight">
 						<p>British pound (£):</p>
-						<p class="countryData"><span>${data.exchangeRates.conversion_rates.GBP}</span></p>
+						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.GBP}</span></p>
 					</div>
 				</div>
 				<div class="divTwoColsSplit">
 					<div class="divSplitColumnsLeft">
 						<p>Swiss franc (CHF):</p>
-						<p class="countryData"><span>${data.exchangeRates.conversion_rates.CHF}</span></p>
+						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.CHF}</span></p>
 					</div>
 					<div class="divSplitColumnsRight">					
 						<p>Renminbi (¥ / 元):</p>
-						<p class="countryData"><span>${data.exchangeRates.conversion_rates.CNY}</span></p>
+						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.CNY}</span></p>
 					</div>
 				</div>
 				<div class="divTwoColsSplit">
 					<div class="divSplitColumnsLeft">
 						<p>Australian dollar (A$):</p>
-						<p class="countryData"><span>${data.exchangeRates.conversion_rates.AUD}</span></p>
+						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.AUD}</span></p>
 					</div>					
 					<div class="divSplitColumnsRight">
 						<p>Canadian dollar (C$):</p>
-						<p class="countryData"><span>${data.exchangeRates.conversion_rates.CAD}</span></p>
+						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.CAD}</span></p>
 					</div>
 				</div>
 				<div class="divTwoColsSplit">
 					<div class="divSplitColumnsLeft">
 						<p>Swedish krona (kr):</p>
-						<p class="countryData"><span>${data.exchangeRates.conversion_rates.SEK}</span></p>
+						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.SEK}</span></p>
 					</div>
 					<div class="divSplitColumnsRight">
 						<p>Norwegian krona (kr):</p>
-						<p class="countryData"><span>${data.exchangeRates.conversion_rates.NOK}</span></p>
+						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.NOK}</span></p>
 					</div>
 				</div>
 				<div class="divTwoColsSplit">
 					<div class="divSplitColumnsLeft">
 						<p>Danish krona (kr):</p>
-						<p class="countryData"><span>${data.exchangeRates.conversion_rates.DKK}</span></p>
+						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.DKK}</span></p>
 					</div>
 					<div class="divSplitColumnsRight">
 						<p>Polish złoty (zł):</p>
-						<p class="countryData"><span>${data.exchangeRates.conversion_rates.PLN}</span></p>
+						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.PLN}</span></p>
 					</div>
 				</div>
 				<div class="divTwoColsSplit">
 					<div class="divSplitColumnsLeft">
 						<p>Czech koruna (Kč):</p>
-						<p class="countryData"><span>${data.exchangeRates.conversion_rates.CZK}</span></p>
+						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.CZK}</span></p>
 					</div>					
 					<div class="divSplitColumnsRight">
 						<p>Romanian leu (L):</p>
-						<p class="countryData"><span>${data.exchangeRates.conversion_rates.RON}</span></p>
+						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.RON}</span></p>
 					</div>
 				</div>
 				<div class="divTwoColsSplit">
 					<div class="divSplitColumnsLeft">
 						<p>Hungarian forint (Ft):</p>
-						<p class="countryData"><span>${data.exchangeRates.conversion_rates.HUF}</span></p>
+						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.HUF}</span></p>
 					</div>					
 					<div class="divSplitColumnsRight">
 						<p>Bulgarian lev (лв):</p>
-						<p class="countryData"><span>${data.exchangeRates.conversion_rates.BGN}</span></p>
+						<p class="countryData"><span>${exchangeRatesData.exchangeRates.conversion_rates.BGN}</span></p>
 					</div>
 				</div>				
 				`)
