@@ -194,7 +194,7 @@ $(document).ready(function () {
 		});
 	}
 
-	function renderCurrencyConversionForm1(currencyArr, allCurrenciesData) {
+	function renderCurrencyConversionForm1(currencyArr, allCurrenciesData, exchangeRatesData) {
 		// Restricts input for each element in the set of matched elements to the given inputFilter.
 		(function ($) {
 			$.fn.inputFilter = function (callback, errMsg) {
@@ -228,21 +228,21 @@ $(document).ready(function () {
 				<div class="row mb-3">
 					<div class="col-5 pr-1">
 						<input type="text" class="form-control" 
-						id="originalAmount" placeholder="convert">
+						id="originalAmount1" placeholder="convert [amount]">
 					</div>
 					<div class="col-7 pl-1 align-self-end">
-						<input readonly class="form-control text-truncate" id="originalCurrency"
+						<input readonly class="form-control text-truncate" id="originalCurrency1"
 							value="${currencyArr[0].name} (${currencyArr[0].symbol})"></input>
 					</div>
 				</div>
 				<div class="row">
 					<div class="col-7 pr-1">
-						<select class="form-control" id="currencySelect">	
-						${populateCurrencySelectContainer(allCurrenciesData.supported_codes)}
+						<select class="form-control" id="currencySelect1">	
+						${populateCurrencySelectContainer(allCurrenciesData.supported_codes, "to: &darr; [select currency] &darr;")}
 						</select>
 					</div>
 					<div class="col-5 pl-1">
-						<p class="form-control" id="resultAmount">result</p>
+						<p class="form-control" id="resultAmount1">result</p>
 					</div>
 				</div>
 				<div class="row">
@@ -252,28 +252,106 @@ $(document).ready(function () {
 				</div>
 			</form>`);
 
-		// can use dot or comma
-		console.log($("#originalAmount").val())
-		$("#originalAmount").inputFilter(function (value) {
+		// Numeric input only: can use dot or comma
+		$("#originalAmount1").inputFilter(function (value) {
 			return /^-?\d*[.,]?\d*$/.test(value);
 		}, "Must be a floating (real) number");
 
 		$("#exchangeForm1").on("submit", function (event) {
 			event.preventDefault();
-			console.log(event.formData)
-			alert("Handler for `submit` called.");
+			// confirm numeric and !NaN, confirm selected currency is not null
+			let originalAmount1 = Number($('#originalAmount1').val())
+			let selectedCurrency = $("#currencySelect1").val();
+			// Number converts null to 0, still invalid
+			if (originalAmount1 && selectedCurrency) {
+				// console.log(exchangeRatesData.exchangeRates.conversion_rates[selectedCurrency]);
+				let targetCurrencyExchangeRate = exchangeRatesData.exchangeRates.conversion_rates[selectedCurrency]
+				let result = targetCurrencyExchangeRate * originalAmount1;
+				$('#resultAmount1').html(result);
+			}
 		});
-
 	}
 
-	function convertCurrency(e) {
-		e.preventDefault();
-		let formData = new FormData(document.getElementById('exchangeForm1'));
-		console.log(formData.entries());
+	function renderCurrencyConversionForm2(currencyArr, allCurrenciesData, exchangeRatesData) {
+		// Restricts input for each element in the set of matched elements to the given inputFilter.
+		(function ($) {
+			$.fn.inputFilter = function (callback, errMsg) {
+				return this.on("input keydown keyup mousedown mouseup select contextmenu drop focusout", function (e) {
+					if (callback(this.value)) {
+						// Accepted value
+						if (["keydown", "mousedown", "focusout"].indexOf(e.type) >= 0) {
+							$(this).removeClass("input-error");
+							this.setCustomValidity("");
+						}
+						this.oldValue = this.value;
+						this.oldSelectionStart = this.selectionStart;
+						this.oldSelectionEnd = this.selectionEnd;
+					} else if (this.hasOwnProperty("oldValue")) {
+						// Rejected value - restore the previous one
+						$(this).addClass("input-error");
+						this.setCustomValidity(errMsg);
+						this.reportValidity();
+						this.value = this.oldValue;
+						this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+					} else {
+						// Rejected value - nothing to restore
+						this.value = "";
+					}
+				});
+			};
+		}(jQuery));
+
+		$(".modal-body").append(`
+			<form class="mb-2" id="exchangeForm2">
+				<div class="row mb-3">
+					<div class="col-5 pr-1">
+						<input type="text" class="form-control" 
+						id="originalAmount2" placeholder="convert [amount]">
+					</div>
+					<div class="col-7 pl-1 align-self-end">
+						<select class="form-control" id="currencySelect2">	
+						${populateCurrencySelectContainer(allCurrenciesData.supported_codes, "&darr; [select currency] &darr;")}
+						</select>						
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-7 pr-1">
+					<input readonly class="form-control text-truncate" id="originalCurrency2"
+							value="to: ${currencyArr[0].name} (${currencyArr[0].symbol})"></input>						
+					</div>
+					<div class="col-5 pl-1">
+						<p class="form-control" id="resultAmount2">result</p>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-12">
+						<button type="submit" class="btn float-right btnSubmit">Convert</button>
+					</div>
+				</div>
+			</form>`);
+
+		// Numeric input only: can use dot or comma
+		$("#originalAmount1").inputFilter(function (value) {
+			return /^-?\d*[.,]?\d*$/.test(value);
+		}, "Must be a floating (real) number");
+
+		$("#exchangeForm2").on("submit", function (event) {
+			event.preventDefault();
+			// confirm numeric and !NaN, confirm selected currency is not null
+			let originalAmount2 = Number($('#originalAmount2').val())
+			let selectedCurrency = $("#currencySelect2").val();
+			// Number converts null to 0, still invalid
+			if (originalAmount2 && selectedCurrency) {
+				// console.log(exchangeRatesData.exchangeRates.conversion_rates[selectedCurrency]);
+				let targetCurrencyExchangeRate = exchangeRatesData.exchangeRates.conversion_rates[selectedCurrency]
+				let result = originalAmount2 / targetCurrencyExchangeRate;
+				$('#resultAmount2').html(result);
+			}
+		});
 	}
 
-	function populateCurrencySelectContainer(allCurrenciesArr) {
-		let options = "<option selected disabled hidden>to:</option>";
+	function populateCurrencySelectContainer(allCurrenciesArr, optionsMenuTitle) {
+		let options = `<option selected disabled hidden>${optionsMenuTitle}</option>`;
 		allCurrenciesArr.forEach(curr => {
 			options += `<option value="${curr[0]}">${curr[1]}</option>\n`
 		});
@@ -833,7 +911,8 @@ $(document).ready(function () {
 					<h4>${currencyArr[0].name} (${currencyArr[0].symbol})</h4>
 				</div>`);
 
-			renderCurrencyConversionForm1(currencyArr, allCurrenciesData);
+			renderCurrencyConversionForm1(currencyArr, allCurrenciesData, exchangeRatesData);
+			renderCurrencyConversionForm2(currencyArr, allCurrenciesData, exchangeRatesData);
 
 			$(".modal-body").append(`
 				<div class="divOneCol">
