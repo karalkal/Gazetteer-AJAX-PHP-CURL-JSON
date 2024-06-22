@@ -264,11 +264,26 @@ h6 {
     font-family: var(--font-main);
     font-weight: 700;
     font-size: 1em;
-
+    -webkit-transition-duration: .4s;
+    /* Safari */
+    transition-duration: .4s;
 }
 
 .btnSubmit:hover {
     background-color: var(--vanilla);
     color: var(--prussian-blue);
     border-color: var(--prussian-blue);
+}
+
+.btnSubmit:focus,
+.btnSubmit:active {
+    outline: none !important;
+    box-shadow: none;
+}
+
+.convertedAmount{
+    background-color: var(--xanthous) !important;
+    font-weight: 700;
+    border: none;
+    box-shadow: none;
 }

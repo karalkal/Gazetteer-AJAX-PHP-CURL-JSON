@@ -242,7 +242,7 @@ $(document).ready(function () {
 						</select>
 					</div>
 					<div class="col-5 pl-1">
-						<p class="form-control" id="resultAmount1">result</p>
+						<p class="form-control" id="resultAmount1">[result]</p>
 					</div>
 				</div>
 				<div class="row">
@@ -254,8 +254,9 @@ $(document).ready(function () {
 
 		// Numeric input only: can use dot or comma
 		$("#originalAmount1").inputFilter(function (value) {
-			return /^-?\d*[.,]?\d*$/.test(value);
-		}, "Must be a floating (real) number");
+			// return /^-?\d*[.,]?\d*$/.test(value);
+			return /^[+]?\d*([.,]\d+)?$/.test(value);
+		}, "Must be a positive real number");
 
 		$("#exchangeForm1").on("submit", function (event) {
 			event.preventDefault();
@@ -267,7 +268,7 @@ $(document).ready(function () {
 				// console.log(exchangeRatesData.exchangeRates.conversion_rates[selectedCurrency]);
 				let targetCurrencyExchangeRate = exchangeRatesData.exchangeRates.conversion_rates[selectedCurrency]
 				let result = targetCurrencyExchangeRate * originalAmount1;
-				$('#resultAmount1').html(result);
+				$('#resultAmount1').html(result).addClass('convertedAmount');;
 			}
 		});
 	}
@@ -320,7 +321,7 @@ $(document).ready(function () {
 							value="to: ${currencyArr[0].name} (${currencyArr[0].symbol})"></input>						
 					</div>
 					<div class="col-5 pl-1">
-						<p class="form-control" id="resultAmount2">result</p>
+						<p class="form-control" id="resultAmount2">[result]</p>
 					</div>
 				</div>
 				<div class="row">
@@ -331,9 +332,9 @@ $(document).ready(function () {
 			</form>`);
 
 		// Numeric input only: can use dot or comma
-		$("#originalAmount1").inputFilter(function (value) {
-			return /^-?\d*[.,]?\d*$/.test(value);
-		}, "Must be a floating (real) number");
+		$("#originalAmount2").inputFilter(function (value) {
+			return /^[+]?\d*([.,]\d+)?$/.test(value);
+		}, "Must be a positive real number");
 
 		$("#exchangeForm2").on("submit", function (event) {
 			event.preventDefault();
@@ -345,7 +346,7 @@ $(document).ready(function () {
 				// console.log(exchangeRatesData.exchangeRates.conversion_rates[selectedCurrency]);
 				let targetCurrencyExchangeRate = exchangeRatesData.exchangeRates.conversion_rates[selectedCurrency]
 				let result = originalAmount2 / targetCurrencyExchangeRate;
-				$('#resultAmount2').html(result);
+				$('#resultAmount2').html(result).addClass('convertedAmount');
 			}
 		});
 	}
