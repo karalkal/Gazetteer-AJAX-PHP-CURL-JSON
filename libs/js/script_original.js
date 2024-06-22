@@ -175,7 +175,7 @@ $(document).ready(function () {
 
 	function loadCountriesNamesAndCodes() {
 		$.ajax({
-			url: "libs/php/getAllCountriesCodes.php",
+			url: "libs/php/loadAllCountriesCodes.php",
 			type: 'GET',
 			dataType: 'json',
 
@@ -197,7 +197,7 @@ $(document).ready(function () {
 
 	function centerMapOnSelectedCountry(countryCodeIso2) {		// get country boundaries, remove prev. polygon and center map
 		$.ajax({
-			url: "libs/php/getCountryBoundaries.php",
+			url: "libs/php/loadCountryBoundaries.php",
 			type: 'GET',
 			dataType: 'json',
 			data: ({ countryCode: countryCodeIso2 }),
