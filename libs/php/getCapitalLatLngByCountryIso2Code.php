@@ -7,7 +7,6 @@ error_reporting(E_ALL);
 
 $executionStartTime = microtime(true);
 
-// GET primary currency code = if more than one, ignore
 $countryDataUrl = 'https://restcountries.com/v3.1/alpha/' . $_REQUEST['countryCodeIso2'];
 
 $ch = curl_init();

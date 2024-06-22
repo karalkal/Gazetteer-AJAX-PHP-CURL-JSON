@@ -28,8 +28,10 @@ const baseMaps = { 		// last one in list will be displayed by default on initial
 	"Satelite (Stadia)": Stadia_AlidadeSatellite, "Terrain (Jawg Lab)": Jawg_Terrain, "General (OpenStreetMap)": OpenStreetMap_HOT
 };
 
+const cities = L.layerGroup([]);
 const overlayMaps = {
-	"Rail (OpenRailwayMap)": OpenRailwayMap
+	"Rail (OpenRailwayMap)": OpenRailwayMap,
+	"Cities": cities,
 };
 
 L.control.layers(baseMaps, overlayMaps).addTo(map);
@@ -83,6 +85,7 @@ $(document).ready(function () {
 	$("#countrySelect").on("change", () => {
 		[countryIso2, countryIso3] = $("#countrySelect").val().split("|");
 		centerMapOnSelectedCountry(countryIso2);
+		setMarkersOnMainCities(countryIso2);
 		setMarkerOnCapitalCoordinates(countryIso2);
 	});
 
@@ -423,6 +426,7 @@ $(document).ready(function () {
 				});
 
 				centerMapOnSelectedCountry(countryIso2);
+				setMarkersOnMainCities(countryIso2);
 				setMarkerOnCapitalCoordinates(countryIso2);
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
@@ -443,6 +447,29 @@ $(document).ready(function () {
 				const capitalCoordinatesArr = result.data.capitalLatLng
 				capitalLatLng = { lat: capitalCoordinatesArr[0], lng: capitalCoordinatesArr[1] }
 				moveMarker(capitalLatLng, true);		// true -> initial country map, do not pan on capital lat/lng
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				console.log(jqXHR, textStatus, errorThrown)
+			}
+		});
+	}
+
+	function setMarkersOnMainCities(countryCodeIso2) {
+		console.log(countryCodeIso2)
+		$.ajax({
+			url: "libs/php/loadCountryBoundingBox.php",
+			type: 'GET',
+			async: false,
+			dataType: 'json',
+			data: { countryCodeIso2 },
+
+			success: function (result) {
+				console.log(result.data.localCountryData.boundingBox);
+				const east = result.data.localCountryData.boundingBox.ne.lon
+				const west = result.data.localCountryData.boundingBox.sw.lon
+				const north = result.data.localCountryData.boundingBox.ne.lat
+				const south = result.data.localCountryData.boundingBox.sw.lat
+				console.log(east, west,north, south)
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown)
