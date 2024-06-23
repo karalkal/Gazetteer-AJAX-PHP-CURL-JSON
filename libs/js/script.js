@@ -44,12 +44,11 @@ function createMarker(city) {
 	let cityIconUrl = fcode === "PPLC"
 		? "libs/fontawesome/svgs/solid/building-flag(prussian-blue).svg"
 		: "libs/fontawesome/svgs/solid/building(prussian-blue).svg";
-		
+
 	let cityIconSize = fcode === "PPLC"
 		? [31, 31]
 		: [22, 22];
 
-	console.log(cityIconUrl, "----", name);
 	let cityIcon = L.icon({
 		iconUrl: cityIconUrl,
 		iconSize: cityIconSize,
@@ -57,14 +56,15 @@ function createMarker(city) {
 		popupAnchor: [11, -17],
 	});
 
-	L.marker([lat, lng], { icon: cityIcon })
+	let cityMarker = L.marker([lat, lng], { icon: cityIcon })
 		.bindPopup(`
 		${toponymName}<br>
 		population: ${population}<br>
 		latitude/longitude: ${lat.toFixed(2)}/${lng.toFixed(2)}<br>
 		wiki: ${wikipedia || 'N.A.'} <br>
-		`)
-		.addTo(map);
+		`);
+
+	cities.addLayer(cityMarker);
 }
 
 
@@ -442,9 +442,10 @@ $(document).ready(function () {
 		});
 	}
 
-
 	function setMarkersOnMainCities(countryCodeIso2) {
-		console.log(countryCodeIso2)
+		// remove existing markers, so when country changed previous ones don't remain on map
+		cities.clearLayers();
+
 		$.ajax({
 			url: "libs/php/loadCountryBoundingBox.php",
 			type: 'GET',
