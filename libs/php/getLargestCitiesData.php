@@ -7,7 +7,18 @@ error_reporting(E_ALL);
 
 $executionStartTime = microtime(true);
 
-$url = 'http://api.geonames.org/srtm1JSON?lat=' . $_REQUEST['lat'] . '&lng=' . $_REQUEST['lng'] . '&username=kurcho&style=full';
+$east = $_GET['east'];
+$west = $_GET['west'];
+$north = $_GET['north'];
+$south = $_GET['south'];
+$url = 'http://api.geonames.org/citiesJSON?'
+    . 'north=' . $north
+    . '&south=' . $south
+    . '&east=' . $east
+    . '&west=' . $west
+    . '&username=kurcho'
+    . '&maxRows=22';
+
 
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -18,19 +29,15 @@ $resultJson = curl_exec($ch);
 
 curl_close($ch);
 
-$decodedDataArray = json_decode($resultJson, true);
+$decodedData = json_decode($resultJson, true);
 
 $output['status']['code'] = "200";
 $output['status']['name'] = "ok";
 $output['status']['description'] = "success";
 $output['status']['returnedIn'] = intval((microtime(true) - $executionStartTime) * 1000) . " ms";
-$output['data']['lat'] = $decodedDataArray['lat'];
-$output['data']['lng'] = $decodedDataArray['lng'];
-$output['data']['srtm1'] = $decodedDataArray['srtm1'];
+$output['data'] = $decodedData;
+
 
 header('Content-Type: application/json; charset=UTF-8');
 
 echo json_encode($output);
-// echo $output;
-
-?>

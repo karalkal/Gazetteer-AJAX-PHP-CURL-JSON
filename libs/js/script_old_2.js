@@ -36,41 +36,55 @@ const overlayMaps = {
 
 L.control.layers(baseMaps, overlayMaps).addTo(map);
 
+//   ----    MOVEABLE MARKER    ----    //
+// if user allows location set it to capital, otherwise will be moved to Athens
+// then when marker is moved set to new values
+const marker = L.marker([0, 0], { draggable: true }).addTo(map);
+// move marker on click on map
+map.on('click', (e) => moveMarker(e.latlng, false));		// false makes pan work
+// move marker when dragged
+marker.on('dragend', (e) => moveMarker(e.target.getLatLng(), false));
+
+function moveMarker(latlng, doNotMove) {
+	// Map will pan to marker location only if clicked or dragged, otherwise map is centered on country
+	// console.log(latlng)
+	marker
+		.setLatLng(latlng)
+		.bindPopup(`lat: ${latlng.lat}, <br>lng: ${latlng.lng}`).openPopup();
+	if (!doNotMove) {
+		map.panTo([latlng.lat, latlng.lng])
+	}
+}
 
 function createMarker(city) {
 	// CAPITAL: "fcodeName": "capital of a political entity", "fcode": "PPLC"
 	// OTHERS: "fcodeName": "seat of a first-order administrative division", "fcode": "PPLA"
 	const { lat, lng, countrycode, name, toponymName, wikipedia, population, fcode } = city
+
+	// ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M48 0C21.5 0 0 21.5 0 48V464c0 26.5 21.5 48 48 48h96V432c0-26.5 21.5-48 48-48s48 21.5 48 48v80h96c26.5 0 48-21.5 48-48V48c0-26.5-21.5-48-48-48H48zM64 240c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V240zm112-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H176c-8.8 0-16-7.2-16-16V240c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H272c-8.8 0-16-7.2-16-16V240zM80 96h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H176c-8.8 0-16-7.2-16-16V112zM272 96h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H272c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16zM448 0c-17.7 0-32 14.3-32 32V512h64V192H624c8.8 0 16-7.2 16-16V48c0-8.8-7.2-16-16-16H480c0-17.7-14.3-32-32-32z"/></svg>'
+	// : '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M48 0C21.5 0 0 21.5 0 48V464c0 26.5 21.5 48 48 48h96V432c0-26.5 21.5-48 48-48s48 21.5 48 48v80h96c26.5 0 48-21.5 48-48V48c0-26.5-21.5-48-48-48H48zM64 240c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V240zm112-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H176c-8.8 0-16-7.2-16-16V240c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H272c-8.8 0-16-7.2-16-16V240zM80 96h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H176c-8.8 0-16-7.2-16-16V112zM272 96h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H272c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16z"/></svg>';
 	let cityIconUrl = fcode === "PPLC"
-		? "libs/fontawesome/svgs/solid/building-flag(prussian-blue).svg"
-		: "libs/fontawesome/svgs/solid/building(prussian-blue).svg";
-		
-	let cityIconSize = fcode === "PPLC"
-		? [31, 31]
-		: [22, 22];
+		? "../fontawesome/svgs/solid/building-flag.svg"
+		: "../fontawesome/svgs/solid/building.svg";
 
-	console.log(cityIconUrl, "----", name);
-	let cityIcon = L.icon({
-		iconUrl: cityIconUrl,
-		iconSize: cityIconSize,
-		iconAnchor: [0, 22],
-		popupAnchor: [11, -17],
-	});
 
-	L.marker([lat, lng], { icon: cityIcon })
-		.bindPopup(`
-		${toponymName}<br>
-		population: ${population}<br>
-		latitude/longitude: ${lat.toFixed(2)}/${lng.toFixed(2)}<br>
-		wiki: ${wikipedia || 'N.A.'} <br>
-		`)
+
+	// let cityIcon = L.icon({
+	// 	iconUrl: cityIconUrl,
+	// 	iconSize: [38, 95],
+	// 	iconAnchor: [22, 94],
+	// 	popupAnchor: [-3, -76],
+	// });
+
+	L.marker([lat, lng], )
+		.bindPopup(`lat: ${lat}, <br>lng: ${lng}`)
 		.addTo(map);
 }
 
 
 $(document).ready(function () {
-	// default country set to Greece, these values are changed as required
-	let [countryIso2, countryIso3] = ["GR", "GRC"]
+	let [countryIso2, countryIso3] = ["GR", "GRC"]				// default country set to Greece, these values are changed as required
+	let capitalLatLng = { lat: 37.983810, lng: 23.727539 }		// will place marker on capital, default Athens
 
 	renderCountriesNamesAndCodes();			// Load Counties as <select> options
 
@@ -79,12 +93,12 @@ $(document).ready(function () {
 		if user refuses, display default country map
 	*/
 	map.locate({ setView: true, maxZoom: 16 });
-	map.once('locationfound', setCountryOfLocation); // gets code AND sets location and gets cities
+	map.once('locationfound', setCountryOfLocation); // gets code AND sets location
 	map.on('locationerror', (e) => {
 		if (e.code === 1) {
 			alert("By default map will be set to Greece/Athens as this is where it all started.\n:-)");
 			centerMapOnSelectedCountry(countryIso2);
-			setMarkersOnMainCities(countryIso2);
+			moveMarker(capitalLatLng, true);		// true will ensure map does not pan on capital coordinates
 		}
 		else {
 			console.log(e);
@@ -97,6 +111,7 @@ $(document).ready(function () {
 		[countryIso2, countryIso3] = $("#countrySelect").val().split("|");
 		centerMapOnSelectedCountry(countryIso2);
 		setMarkersOnMainCities(countryIso2);
+		setMarkerOnCapitalCoordinates(countryIso2);
 	});
 
 	//   ----    INFO BUTTONS    ----    //
@@ -165,6 +180,8 @@ $(document).ready(function () {
 		states: [{
 			title: 'Weather in capital',
 			icon: 'fa-solid fa-cloud-sun',
+			// function expects e.latlng: {lat: XX, lng: XX}
+			// might be reused in other scenarios, i.e. weather at where the marker is moved, hence this argument
 			onClick: async function (btn, map) {
 				getWeather({ latlng: capitalLatLng });
 				$("#genericModal").modal("show")
@@ -435,6 +452,7 @@ $(document).ready(function () {
 
 				centerMapOnSelectedCountry(countryIso2);
 				setMarkersOnMainCities(countryIso2);
+				setMarkerOnCapitalCoordinates(countryIso2);
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown)
@@ -442,6 +460,24 @@ $(document).ready(function () {
 		});
 	}
 
+	function setMarkerOnCapitalCoordinates(countryCodeIso2) {
+		$.ajax({
+			url: "libs/php/getCapitalLatLngByCountryIso2Code.php",
+			type: 'GET',
+			async: false,
+			dataType: 'json',
+			data: { countryCodeIso2 },
+
+			success: function (result) {
+				const capitalCoordinatesArr = result.data.capitalLatLng
+				capitalLatLng = { lat: capitalCoordinatesArr[0], lng: capitalCoordinatesArr[1] }
+				moveMarker(capitalLatLng, true);		// true -> initial country map, do not pan on capital lat/lng
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				console.log(jqXHR, textStatus, errorThrown)
+			}
+		});
+	}
 
 	function setMarkersOnMainCities(countryCodeIso2) {
 		console.log(countryCodeIso2)
@@ -457,7 +493,7 @@ $(document).ready(function () {
 				const west = result.data.localCountryData.boundingBox.sw.lon;
 				const north = result.data.localCountryData.boundingBox.ne.lat;
 				const south = result.data.localCountryData.boundingBox.sw.lat;
-				console.log(east, west, north, south);
+				// console.log(east, west,north, south);
 				$.ajax({
 					url: "libs/php/getLargestCitiesData.php",
 					type: 'GET',
@@ -466,8 +502,9 @@ $(document).ready(function () {
 						east, west, north, south,
 					}),
 					success: function (citiesRes) {
-						// TODO: fix NON-error with data.status.message: "ERROR: canceling statement due to statement timeout"
+						// console.log(citiesRes);
 						const citiesInCountry = (citiesRes.data.geonames).filter(city => city.countrycode === countryCodeIso2);
+						console.log(citiesInCountry);
 						for (let city of citiesInCountry) {
 							createMarker(city);
 						}
