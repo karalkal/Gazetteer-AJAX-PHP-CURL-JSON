@@ -37,7 +37,7 @@ const overlayMaps = {
 L.control.layers(baseMaps, overlayMaps).addTo(map);
 
 
-function createMarker(city) {
+function createCityMarker(city) {
 	// CAPITAL: "fcodeName": "capital of a political entity", "fcode": "PPLC"
 	// OTHERS: "fcodeName": "seat of a first-order administrative division", "fcode": "PPLA"
 	const { lat, lng, countrycode, name, toponymName, wikipedia, population, fcode } = city
@@ -67,10 +67,39 @@ function createMarker(city) {
 	cities.addLayer(cityMarker);
 }
 
+function createEarthquakeMarker(city) {
+	const { lat, lng, datetime, depth, magnitude, src, eqid } = city
+	// let cityIconUrl = fcode === "PPLC"
+	// 	? "libs/fontawesome/svgs/solid/building-flag(prussian-blue).svg"
+	// 	: "libs/fontawesome/svgs/solid/building(prussian-blue).svg";
+
+	// let cityIconSize = fcode === "PPLC"
+	// 	? [31, 31]
+	// 	: [22, 22];
+
+	// let cityIcon = L.icon({
+	// 	iconUrl: cityIconUrl,
+	// 	iconSize: cityIconSize,
+	// 	iconAnchor: [0, 22],
+	// 	popupAnchor: [11, -17],
+	// });
+
+	let cityMarker = L.marker([lat, lng], { icon: cityIcon })
+		.bindPopup(`
+		${toponymName}<br>
+		population: ${population}<br>
+		latitude/longitude: ${lat.toFixed(2)}/${lng.toFixed(2)}<br>
+		wiki: ${wikipedia || 'N.A.'} <br>
+		`);
+
+	cities.addLayer(cityMarker);
+}
+
 
 $(document).ready(function () {
 	// default country set to Greece, these values are changed as required
-	let [countryIso2, countryIso3] = ["GR", "GRC"]
+	let [countryCodeIso2, countryCodeIso3] = ["GR", "GRC"];
+	let [easternMost, westernMost, northersMost, southernMost] = [41.7488862, 34.7006096, 29.7296986, 19.2477876];
 
 	renderCountriesNamesAndCodes();			// Load Counties as <select> options
 
@@ -79,19 +108,21 @@ $(document).ready(function () {
 		if user refuses, display default country map
 	*/
 	map.locate({ setView: true, maxZoom: 16 });
-	map.once('locationfound', setCountryOfLocation); // gets code AND sets location and gets cities
+	map.once('locationfound', getCountryOfUserLocation); // gets code AND sets location and gets cities
 	map.on('locationerror', (e) => {
 		alert(`${e.message}\nBy default map will be set to Greece`);
-		centerMapOnSelectedCountry(countryIso2);
-		setMarkersOnMainCities(countryIso2);
+		centerMapOnSelectedCountry(countryCodeIso2);
+		loadCountryBoundaries(countryCodeIso2);
+		setMarkersOnMainCities(easternMost, westernMost, northersMost, southernMost);
 	}
 	);
 
 	// Enable selection of country from menu
 	$("#countrySelect").on("change", () => {
-		[countryIso2, countryIso3] = $("#countrySelect").val().split("|");
-		centerMapOnSelectedCountry(countryIso2);
-		setMarkersOnMainCities(countryIso2);
+		[countryCodeIso2, countryCodeIso3] = $("#countrySelect").val().split("|");
+		centerMapOnSelectedCountry(countryCodeIso2);
+		loadCountryBoundaries(countryCodeIso2);
+		setMarkersOnMainCities(easternMost, westernMost, northersMost, southernMost);
 	});
 
 	//   ----    INFO BUTTONS    ----    //
@@ -271,7 +302,6 @@ $(document).ready(function () {
 			let selectedCurrency = $("#currencySelect1").val();
 			// Number converts null to 0, still invalid
 			if (originalAmount1 && selectedCurrency) {
-				// console.log(exchangeRatesData.exchangeRates.conversion_rates[selectedCurrency]);
 				let targetCurrencyExchangeRate = exchangeRatesData.exchangeRates.conversion_rates[selectedCurrency]
 				let result = targetCurrencyExchangeRate * originalAmount1;
 				$('#resultAmount1').html(result).addClass('convertedAmount');;
@@ -349,7 +379,6 @@ $(document).ready(function () {
 			let selectedCurrency = $("#currencySelect2").val();
 			// Number converts null to 0, still invalid
 			if (originalAmount2 && selectedCurrency) {
-				// console.log(exchangeRatesData.exchangeRates.conversion_rates[selectedCurrency]);
 				let targetCurrencyExchangeRate = exchangeRatesData.exchangeRates.conversion_rates[selectedCurrency]
 				let result = originalAmount2 / targetCurrencyExchangeRate;
 				$('#resultAmount2').html(result).addClass('convertedAmount');
@@ -397,7 +426,7 @@ $(document).ready(function () {
 				let polygon = L.polygon(latlngs, { color: 'orange' }).addTo(map);
 				// zoom the map to the polygon, leave it on for some time
 				map.fitBounds(polygon.getBounds());
-				setTimeout(() => polygon.removeFrom(map), 8000)
+				setTimeout(() => polygon.removeFrom(map), 8000) //keep on for 17 secs
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown);
@@ -406,7 +435,7 @@ $(document).ready(function () {
 		});
 	}
 
-	function setCountryOfLocation(e) {
+	function getCountryOfUserLocation(e) {
 		const { lat, lng } = e.latlng;
 		$.ajax({
 			url: "libs/php/getCountryIso2CodeByLatLng.php",
@@ -419,17 +448,16 @@ $(document).ready(function () {
 			},
 
 			success: function (result) {
-				countryIso2 = result.data.countryCode;
+				countryCodeIso2 = result.data.countryCode;
 				// need to get iso3 code too to get country info from 'https://countryinfoapi.com/api/countries/{cca3}
-				// TODO: refactor it in a more intelligent way
 				$("option").each(function () {
-					if (($(this).val().split("|")[0]) === countryIso2) {
-						countryIso3 = $(this).val().split("|")[1];
+					if (($(this).val().split("|")[0]) === countryCodeIso2) {
+						countryCodeIso3 = $(this).val().split("|")[1];
 					}
 				});
-
-				centerMapOnSelectedCountry(countryIso2);
-				setMarkersOnMainCities(countryIso2);
+				centerMapOnSelectedCountry(countryCodeIso2);
+				loadCountryBoundaries(countryCodeIso2);
+				setMarkersOnMainCities(easternMost, westernMost, northersMost, southernMost);
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown)
@@ -437,10 +465,7 @@ $(document).ready(function () {
 		});
 	}
 
-	function setMarkersOnMainCities(countryCodeIso2) {
-		// remove existing markers, so when country changed previous ones don't remain on map
-		cities.clearLayers();
-
+	function loadCountryBoundaries(countryCodeIso2) {
 		$.ajax({
 			url: "libs/php/loadCountryBoundingBox.php",
 			type: 'GET',
@@ -451,38 +476,45 @@ $(document).ready(function () {
 			success: function (result) {
 				// some "countries", e.g. N. Cyprus won't contain city data
 				if (result.data.localCountryData) {
-					const east = result.data.localCountryData.boundingBox.ne.lon;
-					const west = result.data.localCountryData.boundingBox.sw.lon;
-					const north = result.data.localCountryData.boundingBox.ne.lat;
-					const south = result.data.localCountryData.boundingBox.sw.lat;
-					const maxRows = 80;  // get plenty of cities as often most populated or capitals are in neighbouring countries, e.g. Greece/Turkey
-					$.ajax({
-						url: "libs/php/getLargestCitiesData.php",
-						type: 'GET',
-						dataType: 'json',
-						data: ({
-							east, west, north, south, maxRows
-						}),
-						success: function (citiesRes) {
-							// TODO: fix NON-error with data.status.message: "ERROR: canceling statement due to statement timeout"
-							// limit cities to 20
-							const citiesInCountry = (citiesRes.data.geonames)
-								.filter(city => city.countrycode === countryCodeIso2)
-								.splice(0, 20);
-							for (let city of citiesInCountry) {
-								createMarker(city);
-							}
-						},
-						error: function (jqXHR, textStatus, errorThrown) {
-							console.log(jqXHR, textStatus, errorThrown)
-						},
-					});
+					easternMost = result.data.localCountryData.boundingBox.ne.lon;
+					westernMost = result.data.localCountryData.boundingBox.sw.lon;
+					northersMost = result.data.localCountryData.boundingBox.ne.lat;
+					southernMost = result.data.localCountryData.boundingBox.sw.lat;
 				}
 			},
-
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown)
 			}
+		})
+	}
+
+	function setMarkersOnMainCities(easternMost, westernMost, northersMost, southernMost) {
+		// remove existing markers, so when country changed previous ones don't remain on map
+		cities.clearLayers();
+		const maxRows = 80;  // get plenty of cities as often most populated or capitals are in neighbouring countries, e.g. Greece/Turkey
+
+		$.ajax({
+			url: "libs/php/getLargestCitiesData.php",
+			type: 'GET',
+			dataType: 'json',
+			data: ({
+				east: easternMost, west: westernMost, north: northersMost, south: southernMost, maxRows
+			}),
+			success: function (citiesRes) {
+				// sometimes returns timeout error
+				if (citiesRes.data && citiesRes.data.geonames) {
+					// limit cities to 20
+					const citiesInCountry = (citiesRes.data.geonames)
+						.filter(city => city.countrycode === countryCodeIso2)
+						.splice(0, 20);
+					for (let city of citiesInCountry) {
+						createCityMarker(city);
+					}
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				console.log(jqXHR, textStatus, errorThrown)
+			},
 		});
 	}
 
@@ -491,7 +523,7 @@ $(document).ready(function () {
 			url: "libs/php/getEssentialCountryData.php",
 			type: 'GET',
 			dataType: 'json',
-			data: ({ countryCodeIso3: countryIso3 }),
+			data: ({ countryCodeIso3: countryCodeIso3 }),
 
 			success: function (result) {
 				renderCountryDataInModal(result.data, "essential");
@@ -508,7 +540,7 @@ $(document).ready(function () {
 			type: 'GET',
 			dataType: 'json',
 			data: ({
-				countryCodeIso3: countryIso3,
+				countryCodeIso3: countryCodeIso3,
 				timeFrame: "2006:2024"
 			}),
 
@@ -527,7 +559,7 @@ $(document).ready(function () {
 			type: 'GET',
 			dataType: 'json',
 			data: ({
-				countryCodeIso3: countryIso3,
+				countryCodeIso3: countryCodeIso3,
 				timeFrame: "2006:2024"
 			}),
 
@@ -546,7 +578,7 @@ $(document).ready(function () {
 			type: 'GET',
 			dataType: 'json',
 			data: ({
-				countryCodeIso3: countryIso3,
+				countryCodeIso3: countryCodeIso3,
 				timeFrame: "1991:2024"			// get education since 1991, as less data is available
 			}),
 
@@ -574,7 +606,7 @@ $(document).ready(function () {
 					type: 'GET',
 					dataType: 'json',
 					data: ({
-						countryCodeIso2: countryIso2,
+						countryCodeIso2: countryCodeIso2,
 					}),
 					success: function (ratesResult) {
 						let combinedData = {
@@ -606,7 +638,7 @@ $(document).ready(function () {
 			data: {
 				lat: lat,
 				lng: lng,
-				countryCodeIso2: countryIso2,
+				countryCodeIso2: countryCodeIso2,
 			},
 
 			success: function (result) {
