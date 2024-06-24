@@ -81,16 +81,11 @@ $(document).ready(function () {
 	map.locate({ setView: true, maxZoom: 16 });
 	map.once('locationfound', setCountryOfLocation); // gets code AND sets location and gets cities
 	map.on('locationerror', (e) => {
-		if (e.code === 1) {
-			alert("By default map will be set to Greece/Athens as this is where it all started.\n:-)");
-			centerMapOnSelectedCountry(countryIso2);
-			setMarkersOnMainCities(countryIso2);
-		}
-		else {
-			console.log(e);
-			alert(e.message);
-		}
-	});
+		alert(`${e.message}\nBy default map will be set to Greece`);
+		centerMapOnSelectedCountry(countryIso2);
+		setMarkersOnMainCities(countryIso2);
+	}
+	);
 
 	// Enable selection of country from menu
 	$("#countrySelect").on("change", () => {
@@ -454,30 +449,37 @@ $(document).ready(function () {
 			data: { countryCodeIso2 },
 
 			success: function (result) {
-				const east = result.data.localCountryData.boundingBox.ne.lon;
-				const west = result.data.localCountryData.boundingBox.sw.lon;
-				const north = result.data.localCountryData.boundingBox.ne.lat;
-				const south = result.data.localCountryData.boundingBox.sw.lat;
-				console.log(east, west, north, south);
-				$.ajax({
-					url: "libs/php/getLargestCitiesData.php",
-					type: 'GET',
-					dataType: 'json',
-					data: ({
-						east, west, north, south,
-					}),
-					success: function (citiesRes) {
-						// TODO: fix NON-error with data.status.message: "ERROR: canceling statement due to statement timeout"
-						const citiesInCountry = (citiesRes.data.geonames).filter(city => city.countrycode === countryCodeIso2);
-						for (let city of citiesInCountry) {
-							createMarker(city);
-						}
-					},
-					error: function (jqXHR, textStatus, errorThrown) {
-						console.log(jqXHR, textStatus, errorThrown)
-					},
-				});
+				// some "countries", e.g. N. Cyprus won't contain city data
+				if (result.data.localCountryData) {
+					const east = result.data.localCountryData.boundingBox.ne.lon;
+					const west = result.data.localCountryData.boundingBox.sw.lon;
+					const north = result.data.localCountryData.boundingBox.ne.lat;
+					const south = result.data.localCountryData.boundingBox.sw.lat;
+					const maxRows = 80;  // get plenty of cities as often most populated or capitals are in neighbouring countries, e.g. Greece/Turkey
+					$.ajax({
+						url: "libs/php/getLargestCitiesData.php",
+						type: 'GET',
+						dataType: 'json',
+						data: ({
+							east, west, north, south, maxRows
+						}),
+						success: function (citiesRes) {
+							// TODO: fix NON-error with data.status.message: "ERROR: canceling statement due to statement timeout"
+							// limit cities to 20
+							const citiesInCountry = (citiesRes.data.geonames)
+								.filter(city => city.countrycode === countryCodeIso2)
+								.splice(0, 20);
+							for (let city of citiesInCountry) {
+								createMarker(city);
+							}
+						},
+						error: function (jqXHR, textStatus, errorThrown) {
+							console.log(jqXHR, textStatus, errorThrown)
+						},
+					});
+				}
 			},
+
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown)
 			}

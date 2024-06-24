@@ -11,13 +11,15 @@ $east = $_GET['east'];
 $west = $_GET['west'];
 $north = $_GET['north'];
 $south = $_GET['south'];
+$maxRows = $_GET['maxRows'];
+
 $url = 'http://api.geonames.org/citiesJSON?'
     . 'north=' . $north
     . '&south=' . $south
     . '&east=' . $east
     . '&west=' . $west
     . '&username=kurcho'
-    . '&maxRows=22';
+    . '&maxRows=' . $maxRows;
 
 
 $ch = curl_init();
