@@ -516,7 +516,7 @@ $(document).ready(function () {
 	function getMainCitiesAndSetMarkers(easternMost, westernMost, northersMost, southernMost) {
 		// remove existing markers, so when country changed previous ones don't remain on map
 		citiesLayer.clearLayers();
-		const maxRows = 80;  // get plenty of cities as often most populated or capitals are in neighbouring countries, e.g. Greece/Turkey
+		const maxRows = 50;  // get plenty of cities as often most populated or capitals are in neighbouring countries, e.g. Greece/Turkey
 
 		$.ajax({
 			url: "libs/php/getLargestCitiesData.php",
@@ -572,7 +572,7 @@ $(document).ready(function () {
 	function getWikiArticlesAndSetMarkers(easternMost, westernMost, northersMost, southernMost) {
 		// remove existing markers, so when country changed previous ones don't remain on map
 		earthquakesLayer.clearLayers();
-		const maxRows = 88;
+		const maxRows = 170;
 
 		$.ajax({
 			url: "libs/php/getWikiData.php",
@@ -582,9 +582,14 @@ $(document).ready(function () {
 				east: easternMost, west: westernMost, north: northersMost, south: southernMost, maxRows
 			}),
 			success: function (wikiRes) {
+				console.log(wikiRes.data);
 				// sometimes returns timeout error
 				if (wikiRes.data && wikiRes.data.geonames) {
-					for (let article of wikiRes.data.geonames) {
+					// filter for country only
+					const articlesForCountry = (wikiRes.data.geonames)
+						.filter(article => article.countryCode === countryCodeIso2);
+
+					for (let article of articlesForCountry) {
 						createWikiMarker(article);
 					}
 				}
