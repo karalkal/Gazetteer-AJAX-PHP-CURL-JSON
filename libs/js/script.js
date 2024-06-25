@@ -28,10 +28,15 @@ const baseMaps = { 		// last one in list will be displayed by default on initial
 	"Satelite (Stadia)": Stadia_AlidadeSatellite, "Terrain (Jawg Lab)": Jawg_Terrain, "General (OpenStreetMap)": OpenStreetMap_HOT
 };
 
-const cities = L.layerGroup([]);
+const citiesLayer = L.layerGroup([]);
+const earthquakesLayer = L.layerGroup([]);
+const wikiLayer = L.layerGroup([]);
+
 const overlayMaps = {
 	"Rail (OpenRailwayMap)": OpenRailwayMap,
-	"Cities": cities,
+	"Cities": citiesLayer,
+	"Earthquakes": earthquakesLayer,
+	"Wiki Articles": wikiLayer,
 };
 
 L.control.layers(baseMaps, overlayMaps).addTo(map);
@@ -52,7 +57,7 @@ function createCityMarker(city) {
 	let cityIcon = L.icon({
 		iconUrl: cityIconUrl,
 		iconSize: cityIconSize,
-		iconAnchor: [0, 22],
+		iconAnchor: [22, 26],
 		popupAnchor: [11, -17],
 	});
 
@@ -61,38 +66,53 @@ function createCityMarker(city) {
 		${toponymName}<br>
 		population: ${population}<br>
 		latitude/longitude: ${lat.toFixed(2)}/${lng.toFixed(2)}<br>
-		wiki: ${wikipedia || 'N.A.'} <br>
+		wiki: ${wikipedia || 'N.A.'}
 		`);
 
-	cities.addLayer(cityMarker);
+	cityMarker.addTo(citiesLayer);
 }
 
-function createEarthquakeMarker(city) {
-	const { lat, lng, datetime, depth, magnitude, src, eqid } = city
-	// let cityIconUrl = fcode === "PPLC"
-	// 	? "libs/fontawesome/svgs/solid/building-flag(prussian-blue).svg"
-	// 	: "libs/fontawesome/svgs/solid/building(prussian-blue).svg";
+function createEarthquakeMarker(earthquake) {
+	const { lat, lng, datetime, depth, magnitude, src, eqid } = earthquake
 
-	// let cityIconSize = fcode === "PPLC"
-	// 	? [31, 31]
-	// 	: [22, 22];
+	let eqMarkerIcon = L.icon({
+		iconUrl: "libs/fontawesome/svgs/solid/circle-dot(red).svg",
+		iconSize: [22, 22],
+		iconAnchor: [0, 22],
+		popupAnchor: [11, -17],
+	});
 
-	// let cityIcon = L.icon({
-	// 	iconUrl: cityIconUrl,
-	// 	iconSize: cityIconSize,
-	// 	iconAnchor: [0, 22],
-	// 	popupAnchor: [11, -17],
-	// });
-
-	let cityMarker = L.marker([lat, lng], { icon: cityIcon })
+	let eqMarker = L.marker([lat, lng], { icon: eqMarkerIcon })
 		.bindPopup(`
-		${toponymName}<br>
-		population: ${population}<br>
+		date/time: ${datetime || 'N.A.'}<br>
 		latitude/longitude: ${lat.toFixed(2)}/${lng.toFixed(2)}<br>
-		wiki: ${wikipedia || 'N.A.'} <br>
+		magnitude: ${magnitude || 'N.A.'}<br>
+		depth: ${depth || 'N.A.'}
 		`);
 
-	cities.addLayer(cityMarker);
+	eqMarker.addTo(earthquakesLayer);
+}
+
+function createWikiMarker(article) {
+	const { lat, lng, title, feature, summary, thumbnailImg, wikipediaUrl } = article
+
+	let wikiIcon = L.icon({
+		iconUrl: "libs/fontawesome/svgs/brands/wikipedia-w(orange).svg",
+		iconSize: [22, 22],
+		iconAnchor: [0, 22],
+		popupAnchor: [11, -17],
+	});
+
+	let wikiMarker = L.marker([lat, lng], { icon: wikiIcon })
+		.bindPopup(`
+		${title} <br>
+		feature: ${feature}<br>
+		summary: ${summary}<br>
+		image: ${thumbnailImg}<br>
+		url: ${wikipediaUrl}
+		`);
+
+	wikiMarker.addTo(wikiLayer);
 }
 
 
@@ -113,16 +133,19 @@ $(document).ready(function () {
 		alert(`${e.message}\nBy default map will be set to Greece`);
 		centerMapOnSelectedCountry(countryCodeIso2);
 		loadCountryBoundaries(countryCodeIso2);
-		setMarkersOnMainCities(easternMost, westernMost, northersMost, southernMost);
-	}
-	);
+		getMainCitiesAndSetMarkers(easternMost, westernMost, northersMost, southernMost);
+		getEarthquakesAndSetMarkers(easternMost, westernMost, northersMost, southernMost);
+		getWikiArticlesAndSetMarkers(easternMost, westernMost, northersMost, southernMost);
+	});
 
 	// Enable selection of country from menu
 	$("#countrySelect").on("change", () => {
 		[countryCodeIso2, countryCodeIso3] = $("#countrySelect").val().split("|");
 		centerMapOnSelectedCountry(countryCodeIso2);
 		loadCountryBoundaries(countryCodeIso2);
-		setMarkersOnMainCities(easternMost, westernMost, northersMost, southernMost);
+		getMainCitiesAndSetMarkers(easternMost, westernMost, northersMost, southernMost);
+		getEarthquakesAndSetMarkers(easternMost, westernMost, northersMost, southernMost);
+		getWikiArticlesAndSetMarkers(easternMost, westernMost, northersMost, southernMost);
 	});
 
 	//   ----    INFO BUTTONS    ----    //
@@ -457,7 +480,9 @@ $(document).ready(function () {
 				});
 				centerMapOnSelectedCountry(countryCodeIso2);
 				loadCountryBoundaries(countryCodeIso2);
-				setMarkersOnMainCities(easternMost, westernMost, northersMost, southernMost);
+				getMainCitiesAndSetMarkers(easternMost, westernMost, northersMost, southernMost);
+				getEarthquakesAndSetMarkers(easternMost, westernMost, northersMost, southernMost);
+				getWikiArticlesAndSetMarkers(easternMost, westernMost, northersMost, southernMost);
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown)
@@ -488,9 +513,9 @@ $(document).ready(function () {
 		})
 	}
 
-	function setMarkersOnMainCities(easternMost, westernMost, northersMost, southernMost) {
+	function getMainCitiesAndSetMarkers(easternMost, westernMost, northersMost, southernMost) {
 		// remove existing markers, so when country changed previous ones don't remain on map
-		cities.clearLayers();
+		citiesLayer.clearLayers();
 		const maxRows = 80;  // get plenty of cities as often most populated or capitals are in neighbouring countries, e.g. Greece/Turkey
 
 		$.ajax({
@@ -509,6 +534,58 @@ $(document).ready(function () {
 						.splice(0, 20);
 					for (let city of citiesInCountry) {
 						createCityMarker(city);
+					}
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				console.log(jqXHR, textStatus, errorThrown)
+			},
+		});
+	}
+
+	function getEarthquakesAndSetMarkers(easternMost, westernMost, northersMost, southernMost) {
+		// remove existing markers, so when country changed previous ones don't remain on map
+		earthquakesLayer.clearLayers();
+		const maxRows = 10;  // 10 is default anyway
+
+		$.ajax({
+			url: "libs/php/getEarthquakesData.php",
+			type: 'GET',
+			dataType: 'json',
+			data: ({
+				east: easternMost, west: westernMost, north: northersMost, south: southernMost, maxRows
+			}),
+			success: function (earthQuakeRes) {
+				// sometimes returns timeout error
+				if (earthQuakeRes.data && earthQuakeRes.data.earthquakes) {
+					for (let equake of earthQuakeRes.data.earthquakes) {
+						createEarthquakeMarker(equake);
+					}
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				console.log(jqXHR, textStatus, errorThrown)
+			},
+		});
+	}
+
+	function getWikiArticlesAndSetMarkers(easternMost, westernMost, northersMost, southernMost) {
+		// remove existing markers, so when country changed previous ones don't remain on map
+		earthquakesLayer.clearLayers();
+		const maxRows = 88;
+
+		$.ajax({
+			url: "libs/php/getWikiData.php",
+			type: 'GET',
+			dataType: 'json',
+			data: ({
+				east: easternMost, west: westernMost, north: northersMost, south: southernMost, maxRows
+			}),
+			success: function (wikiRes) {
+				// sometimes returns timeout error
+				if (wikiRes.data && wikiRes.data.geonames) {
+					for (let article of wikiRes.data.geonames) {
+						createWikiMarker(article);
 					}
 				}
 			},
