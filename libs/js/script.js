@@ -165,6 +165,7 @@ $(document).ready(function () {
 			title: 'Government',
 			icon: 'fa-solid fa-landmark-flag',
 			onClick: async function (btn, map) {
+				$("#genericModal").modal("hide");		// is any modal is rendered hide it first
 				getEssentials();
 				$("#genericModal").modal("show")
 			}
@@ -177,6 +178,7 @@ $(document).ready(function () {
 			title: 'Economy',
 			icon: 'fa-solid fa-money-check-dollar',
 			onClick: async function (btn, map) {
+				$("#genericModal").modal("hide");		// is any modal is rendered hide it first
 				getEconomy();
 				$("#genericModal").modal("show")
 			}
@@ -189,6 +191,7 @@ $(document).ready(function () {
 			title: 'Population',
 			icon: 'fa-solid fa-people-group',
 			onClick: async function (btn, map) {
+				$("#genericModal").modal("hide");		// is any modal is rendered hide it first
 				getPopulation();
 				$("#genericModal").modal("show")
 			}
@@ -201,6 +204,7 @@ $(document).ready(function () {
 			title: 'Education',
 			icon: 'fa-solid fa-person-chalkboard',
 			onClick: async function (btn, map) {
+				$("#genericModal").modal("hide");		// is any modal is rendered hide it first
 				getEducation();
 				$("#genericModal").modal("show")
 			}
@@ -213,6 +217,7 @@ $(document).ready(function () {
 			title: 'Currency',
 			icon: 'fa-solid fa-money-bill-transfer',
 			onClick: async function (btn, map) {
+				$("#genericModal").modal("hide");		// is any modal is rendered hide it first
 				getExchangeRates();
 				$("#genericModal").modal("show")
 			}
@@ -225,8 +230,9 @@ $(document).ready(function () {
 			title: 'Weather in capital',
 			icon: 'fa-solid fa-cloud-sun',
 			onClick: async function (btn, map) {
+				$("#genericModal").modal("hide");		// is any modal is rendered hide it first
 				getWeather({ latlng: capitalLatLng });
-				$("#genericModal").modal("show")
+				$("#genericModal").modal("show");
 			}
 		}]
 	});
@@ -459,7 +465,7 @@ $(document).ready(function () {
 				let polygon = L.polygon(latlngs, { color: 'orange' }).addTo(map);
 				// zoom the map to the polygon, leave it on for some time
 				map.fitBounds(polygon.getBounds());
-				setTimeout(() => polygon.removeFrom(map), 8000) //keep on for 17 secs
+				setTimeout(() => polygon.removeFrom(map), 17000) //keep on for 17 secs
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(jqXHR, textStatus, errorThrown);
@@ -600,7 +606,7 @@ $(document).ready(function () {
 	function getWikiArticlesAndSetMarkers(easternMost, westernMost, northersMost, southernMost) {
 		// remove existing markers, so when country changed previous ones don't remain on map
 		wikiMarkersClusters.clearLayers();
-		const maxRows = 400;
+		const maxRows = 260;
 
 		$.ajax({
 			url: "libs/php/getWikiData.php",
