@@ -128,6 +128,7 @@ $(document).ready(function () {
 	// default country set to Greece, these values are changed as required
 	let [countryCodeIso2, countryCodeIso3] = ["GR", "GRC"];
 	let [easternMost, westernMost, northersMost, southernMost] = [41.7488862, 34.7006096, 29.7296986, 19.2477876];
+	let capitalLatLng = { lat: 37.983810, lng: 23.727539 }
 
 	renderCountriesNamesAndCodes();			// Load Counties as <select> options
 
@@ -151,6 +152,7 @@ $(document).ready(function () {
 		[countryCodeIso2, countryCodeIso3] = $("#countrySelect").val().split("|");
 		centerMapOnSelectedCountry(countryCodeIso2);
 		loadCountryBoundaries(countryCodeIso2);
+		updateCapitalCoordinates(countryCodeIso2);		// needed for weather modal
 		getMainCitiesAndSetMarkers(easternMost, westernMost, northersMost, southernMost);
 		getEarthquakesAndSetMarkers(easternMost, westernMost, northersMost, southernMost);
 		getWikiArticlesAndSetMarkers(easternMost, westernMost, northersMost, southernMost);
@@ -488,6 +490,7 @@ $(document).ready(function () {
 				});
 				centerMapOnSelectedCountry(countryCodeIso2);
 				loadCountryBoundaries(countryCodeIso2);
+				updateCapitalCoordinates(countryCodeIso2);		// needed for weather modal
 				getMainCitiesAndSetMarkers(easternMost, westernMost, northersMost, southernMost);
 				getEarthquakesAndSetMarkers(easternMost, westernMost, northersMost, southernMost);
 				getWikiArticlesAndSetMarkers(easternMost, westernMost, northersMost, southernMost);
@@ -519,6 +522,23 @@ $(document).ready(function () {
 				console.log(jqXHR, textStatus, errorThrown)
 			}
 		})
+	}
+
+	function updateCapitalCoordinates(countryCodeIso2) {
+		$.ajax({
+			url: "libs/php/getCapitalLatLngByCountryIso2Code.php",
+			type: 'GET',
+			async: false,
+			dataType: 'json',
+			data: { countryCodeIso2 },
+			success: function (result) {
+				const capitalCoordinatesArr = result.data.capitalLatLng
+				capitalLatLng = { lat: capitalCoordinatesArr[0], lng: capitalCoordinatesArr[1] }
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				console.log(jqXHR, textStatus, errorThrown)
+			}
+		});
 	}
 
 	function getMainCitiesAndSetMarkers(easternMost, westernMost, northersMost, southernMost) {
