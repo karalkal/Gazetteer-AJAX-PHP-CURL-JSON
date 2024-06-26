@@ -28,14 +28,20 @@ const baseMaps = { 		// last one in list will be displayed by default on initial
 	"Satelite (Stadia)": Stadia_AlidadeSatellite, "Terrain (Jawg Lab)": Jawg_Terrain, "General (OpenStreetMap)": OpenStreetMap_HOT
 };
 
+// define extra layers
 const citiesLayer = L.layerGroup([]);
-const earthquakesLayer = L.layerGroup([]);
+const earthQuakeLayer = L.layerGroup([]);
 const wikiLayer = L.layerGroup([]);
+
+// define and add marker clusters
+const wikiMarkersClusters = L.markerClusterGroup();
+// map.addLayer(wikiMarkersClusters);
+wikiMarkersClusters.addTo(wikiLayer);
 
 const overlayMaps = {
 	"Rail (OpenRailwayMap)": OpenRailwayMap,
 	"Cities": citiesLayer,
-	"Earthquakes": earthquakesLayer,
+	"Earthquakes": earthQuakeLayer,
 	"Wiki Articles": wikiLayer,
 };
 
@@ -90,7 +96,7 @@ function createEarthquakeMarker(earthquake) {
 		depth: ${depth || 'N.A.'}
 		`);
 
-	eqMarker.addTo(earthquakesLayer);
+	eqMarker.addTo(earthQuakeLayer);
 }
 
 function createWikiMarker(article) {
@@ -112,7 +118,9 @@ function createWikiMarker(article) {
 		url: ${wikipediaUrl}
 		`);
 
-	wikiMarker.addTo(wikiLayer);
+	wikiMarkersClusters.addLayer(wikiMarker);
+
+	// wikiMarker.addTo(wikiLayer);
 }
 
 
@@ -545,7 +553,7 @@ $(document).ready(function () {
 
 	function getEarthquakesAndSetMarkers(easternMost, westernMost, northersMost, southernMost) {
 		// remove existing markers, so when country changed previous ones don't remain on map
-		earthquakesLayer.clearLayers();
+		earthQuakeLayer.clearLayers();
 		const maxRows = 10;  // 10 is default anyway
 
 		$.ajax({
@@ -571,8 +579,8 @@ $(document).ready(function () {
 
 	function getWikiArticlesAndSetMarkers(easternMost, westernMost, northersMost, southernMost) {
 		// remove existing markers, so when country changed previous ones don't remain on map
-		earthquakesLayer.clearLayers();
-		const maxRows = 170;
+		wikiMarkersClusters.clearLayers();
+		const maxRows = 400;
 
 		$.ajax({
 			url: "libs/php/getWikiData.php",
@@ -582,12 +590,16 @@ $(document).ready(function () {
 				east: easternMost, west: westernMost, north: northersMost, south: southernMost, maxRows
 			}),
 			success: function (wikiRes) {
-				console.log(wikiRes.data);
-				// sometimes returns timeout error
+				console.log("returnedIn:", wikiRes.status.returnedIn, "ms");
+				// if requesting too much data returns timeout error
+				if (wikiRes.data.status) {
+					alert(`Error ${wikiRes.data.status.value}:\nLoading Wikipedia data timed out.\nIf it is required, please try again later.`)
+				}
 				if (wikiRes.data && wikiRes.data.geonames) {
 					// filter for country only
 					const articlesForCountry = (wikiRes.data.geonames)
 						.filter(article => article.countryCode === countryCodeIso2);
+					console.log(articlesForCountry)
 
 					for (let article of articlesForCountry) {
 						createWikiMarker(article);
