@@ -165,9 +165,7 @@ $(document).ready(function () {
 			title: 'Government',
 			icon: 'fa-solid fa-landmark-flag',
 			onClick: async function (btn, map) {
-				$("#genericModal").modal("hide");		// is any modal is rendered hide it first
 				getEssentials();
-				$("#genericModal").modal("show")
 			}
 		}]
 	});
@@ -178,9 +176,7 @@ $(document).ready(function () {
 			title: 'Economy',
 			icon: 'fa-solid fa-money-check-dollar',
 			onClick: async function (btn, map) {
-				$("#genericModal").modal("hide");		// is any modal is rendered hide it first
 				getEconomy();
-				$("#genericModal").modal("show")
 			}
 		}]
 	});
@@ -191,9 +187,7 @@ $(document).ready(function () {
 			title: 'Population',
 			icon: 'fa-solid fa-people-group',
 			onClick: async function (btn, map) {
-				$("#genericModal").modal("hide");		// is any modal is rendered hide it first
 				getPopulation();
-				$("#genericModal").modal("show")
 			}
 		}]
 	});
@@ -204,9 +198,7 @@ $(document).ready(function () {
 			title: 'Education',
 			icon: 'fa-solid fa-person-chalkboard',
 			onClick: async function (btn, map) {
-				$("#genericModal").modal("hide");		// is any modal is rendered hide it first
 				getEducation();
-				$("#genericModal").modal("show")
 			}
 		}]
 	});
@@ -217,9 +209,7 @@ $(document).ready(function () {
 			title: 'Currency',
 			icon: 'fa-solid fa-money-bill-transfer',
 			onClick: async function (btn, map) {
-				$("#genericModal").modal("hide");		// is any modal is rendered hide it first
 				getExchangeRates();
-				$("#genericModal").modal("show")
 			}
 		}]
 	});
@@ -230,9 +220,7 @@ $(document).ready(function () {
 			title: 'Weather in capital',
 			icon: 'fa-solid fa-cloud-sun',
 			onClick: async function (btn, map) {
-				$("#genericModal").modal("hide");		// is any modal is rendered hide it first
 				getWeather({ latlng: capitalLatLng });
-				$("#genericModal").modal("show");
 			}
 		}]
 	});
@@ -1263,6 +1251,8 @@ $(document).ready(function () {
 			`)
 		}
 
+		// AND FINALLY, make the modal visible
+		$("#genericModal").modal("show");
 	}
 
 	// end of $(document).ready(function {
