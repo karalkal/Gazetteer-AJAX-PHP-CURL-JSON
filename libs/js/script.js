@@ -602,7 +602,7 @@ $(document).ready(function () {
 	function getWikiArticlesAndSetMarkers(easternMost, westernMost, northersMost, southernMost) {
 		// remove existing markers, so when country changed previous ones don't remain on map
 		wikiMarkersClusters.clearLayers();
-		const maxRows = 260;
+		const maxRows = 170;
 
 		$.ajax({
 			url: "libs/php/getWikiData.php",
