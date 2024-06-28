@@ -118,10 +118,18 @@ function createWikiMarker(article) {
 		popupAnchor: [11, -17],
 	});
 
+	// undefined summary sometimes, e.g. Dom. Rep.
+	let truncatedSummary = summary !== undefined
+		? summary.substr(0, 150) + '...'
+		: "N.A.";
+	if (!summary) {
+		console.log(wikipediaUrl)
+	}
+
 	let wikiMarker = L.marker([lat, lng], { icon: wikiIcon })
 		.bindPopup(`
 		<p class="popupTitle">${title} <p>
-		<p><span>summary:</span>&nbsp;&nbsp;${summary.substr(0, 150) + '...'}</p>
+		<p><span>summary:</span>&nbsp;&nbsp;${truncatedSummary}</p>
 		${imgParagraphElement}
 		<p><span>url:</span><a class="popup-link" href="https://${wikipediaUrl}" target="_blank">${wikipediaUrl || 'N.A.'}</a></p>
 		`);
@@ -432,7 +440,7 @@ $(document).ready(function () {
 	function centerMapOnSelectedCountry(countryCodeIso2) {		// get country boundaries, remove prev. polygon and center map
 		// select from options too
 		$(`#countrySelect option[value='${countryCodeIso2}|${countryCodeIso3}']`).prop("selected", true);
-		
+
 		$.ajax({
 			url: "libs/php/loadCountryBoundaries.php",
 			type: 'GET',
