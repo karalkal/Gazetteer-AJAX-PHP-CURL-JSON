@@ -299,12 +299,7 @@ $(document).ready(function () {
 		}(jQuery));
 
 		$(".modal-body").append(`
-			<form class="mt-2 mb-2" id="exchangeForm1">
-				<div class="row mb-1">
-					<div class="col-12">
-						<h6>convert local to foreign:</h6>
-					</div>
-				</div>
+			<form class="mb-2" id="exchangeForm1">
 				<div class="row mb-3">
 					<div class="col-5 pr-1">
 						<input type="text" class="form-control" 
@@ -324,40 +319,32 @@ $(document).ready(function () {
 					<div class="col-5 pl-1">
 						<p class="form-control" id="resultAmount1">[result]</p>
 					</div>
-				</div>				
+				</div>
+				<div class="row">
+					<div class="col-12">
+						<button type="submit" class="btn float-right btnSubmit">Convert</button>
+					</div>
+				</div>
 			</form>`);
 
 		// Numeric input only: can use dot or comma
-		$("#originalAmount1").on("keyup").inputFilter(function (value) {
-			return /^-?\d*[.,]?\d*$/.test(value);
+		$("#originalAmount1").inputFilter(function (value) {
+			// return /^-?\d*[.,]?\d*$/.test(value);
+			return /^[+]?\d*([.,]\d+)?$/.test(value);
 		}, "Must be a positive real number");
 
-		$("#exchangeForm1 #currencySelect1").
-			on("change", calculateFromNativeToForeign);
-		$("#exchangeForm1 #originalAmount1").
-			on("keyup", calculateFromNativeToForeign);
-
-
-		function calculateFromNativeToForeign(event) {
+		$("#exchangeForm1").on("submit", function (event) {
 			event.preventDefault();
-			// Number converts null, empty string to 0, i.e. still should not trigger currency conversion, 
-			// BUT make user input of '0' valid
-			let originalAmount1 = undefined;
-			if ($('#originalAmount1').val() || $('#originalAmount1').val() === "0") {
-				originalAmount1 = Number($('#originalAmount1').val())
-			}
+			// confirm numeric and !NaN, confirm selected currency is not null
+			let originalAmount1 = Number($('#originalAmount1').val())
 			let selectedCurrency = $("#currencySelect1").val();
-
-			// confirm numeric and !NaN and !undefined (allow 0), confirm selected currency is not null
-			if (originalAmount1 !== undefined && selectedCurrency) {
+			// Number converts null to 0, still invalid
+			if (originalAmount1 && selectedCurrency) {
 				let targetCurrencyExchangeRate = exchangeRatesData.exchangeRates.conversion_rates[selectedCurrency]
-				let result = (targetCurrencyExchangeRate * originalAmount1).toFixed(6);
-				$('#resultAmount1').html(result).addClass('convertedAmount');
+				let result = targetCurrencyExchangeRate * originalAmount1;
+				$('#resultAmount1').html(result).addClass('convertedAmount');;
 			}
-			else {		// reinstate original state
-				$('#resultAmount1').html('[result]').removeClass('convertedAmount');
-			}
-		}
+		});
 	}
 
 	function renderCurrencyConversionForm2(currencyArr, allCurrenciesData, exchangeRatesData) {
@@ -390,12 +377,7 @@ $(document).ready(function () {
 		}(jQuery));
 
 		$(".modal-body").append(`
-			<form class="mt-2 mb-2" id="exchangeForm2">
-				<div class="row mb-1">
-					<div class="col-12">
-						<h6>convert foreign to local:</h6>
-					</div>
-				</div>
+			<form class="mb-2" id="exchangeForm2">
 				<div class="row mb-3">
 					<div class="col-5 pr-1">
 						<input type="text" class="form-control" 
@@ -415,40 +397,31 @@ $(document).ready(function () {
 					<div class="col-5 pl-1">
 						<p class="form-control" id="resultAmount2">[result]</p>
 					</div>
-				</div>				
+				</div>
+				<div class="row">
+					<div class="col-12">
+						<button type="submit" class="btn float-right btnSubmit">Convert</button>
+					</div>
+				</div>
 			</form>`);
 
 		// Numeric input only: can use dot or comma
-		$("#originalAmount2").on("keyup").inputFilter(function (value) {
-			return /^-?\d*[.,]?\d*$/.test(value);
+		$("#originalAmount2").inputFilter(function (value) {
+			return /^[+]?\d*([.,]\d+)?$/.test(value);
 		}, "Must be a positive real number");
 
-		$("#exchangeForm2 #currencySelect2").
-			on("change", calculateFromForeignToLocal);
-		$("#exchangeForm2 #originalAmount2").
-			on("keyup", calculateFromForeignToLocal);
-
-
-		function calculateFromForeignToLocal(event) {
+		$("#exchangeForm2").on("submit", function (event) {
 			event.preventDefault();
-			// Number converts null, empty string to 0, i.e. still should not trigger currency conversion, 
-			// BUT make user input of '0' valid
-			let originalAmount2 = undefined;
-			if ($('#originalAmount2').val() || $('#originalAmount2').val() === "0") {
-				originalAmount2 = Number($('#originalAmount2').val())
-			}
+			// confirm numeric and !NaN, confirm selected currency is not null
+			let originalAmount2 = Number($('#originalAmount2').val())
 			let selectedCurrency = $("#currencySelect2").val();
-
-			// confirm numeric and !NaN and !undefined (allow 0), confirm selected currency is not null
-			if (originalAmount2 !== undefined && selectedCurrency) {
+			// Number converts null to 0, still invalid
+			if (originalAmount2 && selectedCurrency) {
 				let targetCurrencyExchangeRate = exchangeRatesData.exchangeRates.conversion_rates[selectedCurrency]
-				let result = (originalAmount2 / targetCurrencyExchangeRate).toFixed(6);
+				let result = originalAmount2 / targetCurrencyExchangeRate;
 				$('#resultAmount2').html(result).addClass('convertedAmount');
 			}
-			else {		// reinstate original state
-				$('#resultAmount2').html('[result]').removeClass('convertedAmount');
-			}
-		}
+		});
 	}
 
 	function populateCurrencySelectContainer(allCurrenciesArr, optionsMenuTitle) {
