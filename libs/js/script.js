@@ -145,7 +145,7 @@ $(document).ready(function () {
 		if user refuses, display default country map
 	*/
 	map.locate({ setView: true, maxZoom: 16 });
-	map.once('locationfound', getCountryOfUserLocation); // gets code AND sets location and gets cities
+	map.once('locationfound', setCountryOfUserLocation); // gets code AND sets location and gets cities
 	map.on('locationerror', (e) => {
 		alert(`${e.message}\nBy default map will be set to Greece`);
 		centerMapOnSelectedCountry(countryCodeIso2);
@@ -430,6 +430,9 @@ $(document).ready(function () {
 	}
 
 	function centerMapOnSelectedCountry(countryCodeIso2) {		// get country boundaries, remove prev. polygon and center map
+		// select from options too
+		$(`#countrySelect option[value='${countryCodeIso2}|${countryCodeIso3}']`).prop("selected", true);
+		
 		$.ajax({
 			url: "libs/php/loadCountryBoundaries.php",
 			type: 'GET',
@@ -438,7 +441,7 @@ $(document).ready(function () {
 
 			success: function (result) {
 				// NB - we need latlng arrays but the STUPID json is providing longitude first, then latitude, hence need to invert them
-				let latlngs = []
+				let latlngs = [];
 				if (result.data.geometryType === "Polygon") {
 					for (let tuple of result.data.coordinatesArray[0]) {
 						latlngs.push([tuple[1], tuple[0]])
@@ -470,7 +473,7 @@ $(document).ready(function () {
 		});
 	}
 
-	function getCountryOfUserLocation(e) {
+	function setCountryOfUserLocation(e) {
 		const { lat, lng } = e.latlng;
 		$.ajax({
 			url: "libs/php/getCountryIso2CodeByLatLng.php",
